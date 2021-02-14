@@ -1,0 +1,41 @@
+.signup-container {
+  max-width: 400px;
+  display: block;
+  margin: 50px auto 50px auto;
+  background: var(--blue);
+  height: fit-content;
+  padding: 20px;
+  border: solid var(--black) 5px;
+  border-radius: 20px;
+}
+
+.name-label {
+  color: var(--white);
+  font-weight: 500;
+  font-size: 2rem;
+}
+
+.name-field {
+  border: 5px var(--black) solid;
+  height: 50px;
+  width: 250px;
+  font-size: 1.5rem;
+  border-radius: 15px;
+}
+
+.signup-submit-btn {
+  color: yellow;
+  width: 250px;
+  height: 60px;
+  font-size: 1.5rem;
+  margin: 20px;
+  border: solid var(--white) 5px;
+  border-radius: 15px;
+  background: var(--red);
+  filter: brightness(1.2);
+}
+
+.signup-submit-btn:hover {
+  cursor: pointer;
+  filter: brightness(1.5);
+}
