@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import Routes from "./components/Routes";
+import TypesProvider from "./contexts/TypesContext";
 import UsersList from "./components/UsersList";
 import SignupPage from "./pages/SignupPage";
 import api from "./requests/api";
@@ -65,25 +66,27 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <CurrentGamePage
-        currentUser={user1}
-        invitedUser={user2}
-        game={game}
-        updateGame={setGame}
-      />
-      <Router>
-        <Routes
-          user={user}
-          activeUsers={activeUsers}
-          updateUser={updateUser}
-          currentGame={currentGame}
-          updateGame={setCurrentGame}
-          invitedUser={invitedUser}
-          updateInvitedUser={updateInvitedUser}
+    <TypesProvider>
+      <div className="App">
+        <CurrentGamePage
+          currentUser={user1}
+          invitedUser={user2}
+          game={game}
+          updateGame={setGame}
         />
-      </Router>
-    </div>
+        <Router>
+          <Routes
+            user={user}
+            activeUsers={activeUsers}
+            updateUser={updateUser}
+            currentGame={currentGame}
+            updateGame={setCurrentGame}
+            invitedUser={invitedUser}
+            updateInvitedUser={updateInvitedUser}
+          />
+        </Router>
+      </div>
+    </TypesProvider>
   );
 }
 
