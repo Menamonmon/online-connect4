@@ -1,7 +1,7 @@
-const { gameStateTypes, userStateTypes, coinStateTypes } = require("./types");
+const types = require("./types");
 
-const DEFAULT_USER_STATUS = userStateTypes.ACTIVE;
-const DEFAULT_GAME_STATUS = gameStateTypes.AVAIL;
+const DEFAULT_USER_STATUS = types.user.ACTIVE;
+const DEFAULT_GAME_STATUS = types.game.AVAIL;
 
 function generatePlaceholderString(length) {
   let final = "";
@@ -21,8 +21,8 @@ async function checkIfTypeExists(pool, typname) {
 
 async function createTables(pool) {
   // Creating the ENUM Types for representing the states for the game and the user
-  const userStatusTypesArray = Object.values(userStateTypes);
-  const gameStatusTypesArray = Object.values(gameStateTypes);
+  const userStatusTypesArray = Object.values(types.user);
+  const gameStatusTypesArray = Object.values(types.game);
 
   const enumTypesReducer = (final, current, i) => {
     if (i == 1) {
@@ -57,7 +57,7 @@ async function createTables(pool) {
     `
   );
   console.log("USER TABLE CREATED");
-  const INITIAL_GAME_STATE = `${coinStateTypes.EMPTY}`.repeat(36);
+  const INITIAL_GAME_STATE = `${types.cell.EMPTY}`.repeat(36);
   await pool.query(
     `
     CREATE TABLE IF NOT EXISTS games (

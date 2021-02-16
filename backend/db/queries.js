@@ -24,7 +24,7 @@ async function getUserById(id) {
 async function getActiveUsers(currentUserId) {
   const results = await pool.query(
     "SELECT * FROM users WHERE (NOT id = $1) AND status = $2",
-    [currentUserId, types.userStateTypes.ACTIVE]
+    [currentUserId, types.user.ACTIVE]
   );
 
   return await results.rows;
@@ -66,7 +66,7 @@ async function updateUserName(id, newName) {
 }
 
 async function updateUserStatus(id, newStatus) {
-  if (!Object.values(types.userStateTypes).includes(newStatus)) {
+  if (!Object.values(types.user).includes(newStatus)) {
     throw Error("Invalid User State Type");
   }
 
@@ -106,7 +106,7 @@ async function updateGameState(gameId, newState) {
 
 async function updateGameStatus(gameId, newStatus) {
   const results =
-    newStatus === types.gameStateTypes.ENDED
+    newStatus === types.game.ENDED
       ? await pool.query(
           "UPDATE games SET status = $1, ended_at = NOW() WHERE id = $2 RETURNING *",
           [newStatus, gameId]

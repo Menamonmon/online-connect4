@@ -1,21 +1,21 @@
-const coinStateTypes = {
+const cell = {
   EMPTY: 0,
   RED: 1,
   YELLOW: 2,
 };
 
-const userStateTypes = {
+const user = {
   ACTIVE: "USERACTIVE",
   INACTIVE: "USERINACTIVE",
 };
 
-const gameStateTypes = {
+const game = {
   AVAIL: "GAMEAVAIL",
   UNAVAIL: "GAMEUNAVAIL",
   ENDED: "GAMEENDED"
 }
 module.exports = {
-  coinStateTypes,
-  userStateTypes,
-  gameStateTypes,
+  cell,
+  game,
+  user,
 };
