@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.raw());
 app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use("/types", require("./routes/api/types"));
 app.use("/users", require("./routes/api/users"));
 app.use("/games", require("./routes/api/games"));
 
