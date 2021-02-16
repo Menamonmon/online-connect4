@@ -66,8 +66,8 @@ function App() {
   };
 
   return (
-    <TypesProvider>
-      <div className="App">
+    <div className="App">
+      <TypesProvider>
         <CurrentGamePage
           currentUser={user1}
           invitedUser={user2}
@@ -85,8 +85,8 @@ function App() {
             updateInvitedUser={updateInvitedUser}
           />
         </Router>
-      </div>
-    </TypesProvider>
+      </TypesProvider>
+    </div>
   );
 }
 

@@ -18,11 +18,11 @@ async function getActiveUsersList(userId) {
 }
 
 async function createGame(player1Id, player2Id) {
-  return await apiClient.post("games/create", { player1Id, player2Id });
+  return await apiClient.post("/games/create", { player1Id, player2Id });
 }
 
 async function getTypes() {
-  return await apiClient.get("types");
+  return await apiClient.get("/types");
 }
 
 const api = {
@@ -30,6 +30,7 @@ const api = {
   getGameListForUser,
   getActiveUsersList,
   createGame,
+  getTypes,
 };
 
 export default api;

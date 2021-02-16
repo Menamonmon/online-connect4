@@ -3,7 +3,7 @@ import api from "../requests/api";
 
 const TypesContext = createContext({});
 
-export default function TypesProvider() {
+export default function TypesProvider({ children }) {
   const [types, setTypes] = useState({});
 
   useEffect(() => {
@@ -23,7 +23,9 @@ export default function TypesProvider() {
     setTypes(fetchedTypes);
   }, []);
 
-  return <TypesContext.Provider value={types} />;
+  return (
+    <TypesContext.Provider value={types}>{children}</TypesContext.Provider>
+  );
 }
 
 export function useTypes() {
