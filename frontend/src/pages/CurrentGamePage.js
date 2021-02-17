@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import GameCanvas from "../components/Game";
 import GameCell from "../components/GameCell";
+import { useGames } from "../contexts/GamesContext";
+import { useUsers } from "../contexts/UsersContext";
 
-export default function CurrentGamePage({
-  currentUser,
-  invitedUser,
-  game,
-  updateGame,
-}) {
+export default function CurrentGamePage() {
+  const { currentUser, invitedUser } = useUsers();
+  let { currentGame: game, updateGame } = useGames();
+
   const currentUserColor =
     game.player_1_id === currentUser.id
       ? game.player_1_color

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useGames } from "../contexts/GamesContext";
+import { useUsers } from "../contexts/UsersContext";
 import api from "../requests/api";
 
 function inviteUser(invitedUser) {
@@ -7,11 +9,9 @@ function inviteUser(invitedUser) {
   return { data: { isAccepted: false } };
 }
 
-export default function UserInvitePage({
-  updateGame,
-  currentUser,
-  invitedUser,
-}) {
+export default function UserInvitePage() {
+  let { updateCurrentGame: updateGame } = useGames();
+  let { currentUser, invitedUser } = useUsers();
 
   async function checkInviteStatus(inviteStatus) {
     if (inviteStatus) {
