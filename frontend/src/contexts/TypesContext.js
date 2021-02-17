@@ -8,19 +8,19 @@ export default function TypesProvider({ children }) {
 
   useEffect(() => {
     async function fetchTypes() {
-      let fetchedTypes = types;
+      let res = null;
       try {
-        fetchedTypes = await api.getTypes();
+        res = await api.getTypes();
       } catch (err) {
         console.log(err);
-        return fetchedTypes;
+        return;
       }
 
-      return fetchedTypes;
+      const fetchedTypes = await res.data;
+      setTypes(fetchedTypes);
     }
 
-    const fetchedTypes = fetchTypes();
-    setTypes(fetchedTypes);
+    fetchTypes();
   }, []);
 
   return (
