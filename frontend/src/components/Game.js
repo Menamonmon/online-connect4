@@ -1,16 +1,15 @@
 import React from "react";
-import api from "../requests/api";
+import { useGames } from "../contexts/GamesContext";
 import "./Game.css";
 import GameCell from "./GameCell";
 
 export default function GameCanvas({
-  game,
-  updateGame,
   playerColor,
   useWinner,
   useWarning,
   switchPlayers,
 }) {
+  let { currentGame: game, updateCurrentGame: updateGame } = useGames();
   let [winner, updateWinner] = useWinner();
   let [warning, setWarning] = useWarning();
 
