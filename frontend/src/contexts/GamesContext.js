@@ -14,7 +14,7 @@ export default function GamesProvider({ children, value: inheritedValue }) {
     inheritedValue.currentGame || initialGamesValue.currentGame
   );
   const [prevGames, setPrevGames] = useState(
-    inheritedValue.prevGames.prevGames || initialGamesValue.prevGames
+    inheritedValue.prevGames || initialGamesValue.prevGames
   );
 
   const updateCurrentGame = (newGame) => {
