@@ -63,7 +63,7 @@ export default function Routes() {
         path="/game"
         isAuthenticated={() => exists.currentGame}
         redirectPath="/signup"
-        component={() => <pre>{JSON.stringify(currentGame, undefined, 2)}</pre>}
+        component={CurrentGamePage}
       />
     </Switch>
   );
