@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import "./App.css";
 import Routes from "./components/Routes";
-import TypesProvider from "./contexts/TypesContext";
 import UsersList from "./components/UsersList";
 import SignupPage from "./pages/SignupPage";
 import api from "./requests/api";
 import { BrowserRouter as Router } from "react-router-dom";
 import GameCanvas from "./components/Game";
 import CurrentGamePage from "./pages/CurrentGamePage";
+import TypesProvider from "./contexts/TypesContext";
+import UsersProvider from "./contexts/UsersContext";
+import GamesProvider from "./contexts/GamesContext";
 
 function App() {
   let [user, setUser] = useState({});
@@ -68,23 +70,27 @@ function App() {
   return (
     <div className="App">
       <TypesProvider>
-        <CurrentGamePage
-          currentUser={user1}
-          invitedUser={user2}
-          game={game}
-          updateGame={setGame}
-        />
-        <Router>
-          <Routes
-            user={user}
-            activeUsers={activeUsers}
-            updateUser={updateUser}
-            currentGame={currentGame}
-            updateGame={setCurrentGame}
-            invitedUser={invitedUser}
-            updateInvitedUser={updateInvitedUser}
-          />
-        </Router>
+        <UsersProvider>
+          <GamesProvider>
+            <CurrentGamePage
+              currentUser={user1}
+              invitedUser={user2}
+              game={game}
+              updateGame={setGame}
+            />
+            <Router>
+              <Routes
+                user={user}
+                activeUsers={activeUsers}
+                updateUser={updateUser}
+                currentGame={currentGame}
+                updateGame={setCurrentGame}
+                invitedUser={invitedUser}
+                updateInvitedUser={updateInvitedUser}
+              />
+            </Router>
+          </GamesProvider>
+        </UsersProvider>
       </TypesProvider>
     </div>
   );
