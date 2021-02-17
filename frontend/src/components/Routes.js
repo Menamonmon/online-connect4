@@ -1,66 +1,67 @@
-import { Switch } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Route, Switch } from "react-router-dom";
+import { useGames } from "../contexts/GamesContext";
+import { useUsers } from "../contexts/UsersContext";
+import CurrentGamePage from "../pages/CurrentGamePage";
 import SignupPage from "../pages/SignupPage";
 import UserInvitePage from "../pages/UserInvitePage";
+import { isObjectEmpty } from "../utils/utils";
 import ProtectedRoute from "./ProtectedRoute";
 import UsersList from "./UsersList";
 
-export default function Routes({
-  user,
-  activeUsers,
-  updateUser,
-  currentGame,
-  updateGame,
-  invitedUser,
-  updateInvitedUser,
-}) {
-  const userExists = Object.keys(user).length !== 0;
-  const invitedUserExists = Object.keys(invitedUser).length !== 0;
-  const currentGameExists = Object.keys(currentGame).length !== 0;
+export default function Routes() {
+  const { currentUser, invitedUser } = useUsers();
+  const { currentGame } = useGames();
+
+  let [exists, setExists] = useState({
+    currentUser: false,
+    invitedUser: false,
+    currentGame: false,
+  });
+
+  useEffect(() => {
+    const newExists = {
+      currentUser: !isObjectEmpty(currentUser),
+      invitedUser: !isObjectEmpty(invitedUser),
+      currentGame: !isObjectEmpty(currentGame),
+    };
+    setExists(newExists);
+  }, []);
 
   return (
     <Switch>
+      <Route exact strict path="/" component={CurrentGamePage}/>
       <ProtectedRoute
         exact
         strict
         path="/signup"
-        isAuthenticated={() => !userExists}
+        isAuthenticated={() => !exists.currentUser}
         redirectPath="/users-list"
-        component={() => <SignupPage updateUser={updateUser} />}
+        component={SignupPage}
       />
       <ProtectedRoute
         exact
         strict
         path="/users-list"
-        isAuthenticated={() => userExists}
+        isAuthenticated={() => exists.currentUser}
         redirectPath="/signup"
-        component={() => (
-          <UsersList
-            users={activeUsers}
-            updateInvitedUser={updateInvitedUser}
-          />
-        )}
+        component={UsersList}
       />
       <ProtectedRoute
         exact
         strict
         path="/invite-user"
         isAuthenticated={() =>
-          invitedUserExists && userExists && !currentGameExists
+          exists.invitedUser && exists.currentUser && !exists.currentGame
         }
-        redirectPath={currentGameExists ? "/game" : "/signup"}
-        component={() => (
-          <UserInvitePage
-            currentUser={user}
-            invitedUser={invitedUser}
-            updateGame={updateGame}
-          />
-        )}
+        redirectPath={exists.currentGame ? "/game" : "/signup"}
+        component={UserInvitePage}
       />
       <ProtectedRoute
         exact
         strict
         path="/game"
-        isAuthenticated={() => currentGameExists}
+        isAuthenticated={() => exists.currentGame}
         redirectPath="/signup"
         component={() => <pre>{JSON.stringify(currentGame, undefined, 2)}</pre>}
       />
