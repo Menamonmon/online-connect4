@@ -19,32 +19,29 @@ async function checkIfTypeExists(pool, typname) {
   return results.rowCount === 1;
 }
 
+const enumTypesReducer = (final, current, i) => {
+  if (i == 1) {
+    return `'${final}'` + `, '${current}'`;
+  }
+  return final + `, '${current}'`;
+};
+
+async function createEnumType(pool, typename, typeValuesArray) {
+  if (!(await checkIfTypeExists(pool, typename))) {
+    await pool.query(
+      `CREATE TYPE ${typename} AS ENUM(${typeValuesArray.reduce(
+        enumTypesReducer
+      )})`
+    );
+  }
+}
+
 async function createTables(pool) {
   // Creating the ENUM Types for representing the states for the game and the user
-  const userStatusTypesArray = Object.values(types.user);
-  const gameStatusTypesArray = Object.values(types.game);
+  await createEnumType(pool, "userstatus", Object.values(types.user));
+  await createEnumType(pool, "gamestatus", Object.values(types.game));
+  await createEnumType(pool, "cellstatus", Object.values(types.cell));
 
-  const enumTypesReducer = (final, current, i) => {
-    if (i == 1) {
-      return `'${final}'` + `, '${current}'`;
-    }
-    return final + `, '${current}'`;
-  };
-
-  if (!(await checkIfTypeExists(pool, "userstatus"))) {
-    await pool.query(
-      `CREATE TYPE userstatus AS ENUM(${userStatusTypesArray.reduce(
-        enumTypesReducer
-      )})`
-    );
-  }
-  if (!(await checkIfTypeExists(pool, "gamestatus"))) {
-    await pool.query(
-      `CREATE TYPE gamestatus AS ENUM(${gameStatusTypesArray.reduce(
-        enumTypesReducer
-      )})`
-    );
-  }
   console.log("ENUM TYPES CREATED");
   await pool.query(
     `
@@ -68,14 +65,26 @@ async function createTables(pool) {
       status gamestatus NOT NULL DEFAULT '${DEFAULT_GAME_STATUS}',
       created_at TIMESTAMP DEFAULT NOW(),
       ended_at TIMESTAMP,
+      current_player INT NOT NULL,
+      player_1_color INT NOT NULL,
+      player_2_color INT NOT NULL,
+      winner INT DEFAULT NULL
       FOREIGN KEY (player_1_id)
         REFERENCES users(id)
         ON DELETE SET NULL,
       FOREIGN KEY (player_2_id)
         REFERENCES users(id)
         ON DELETE SET NULL,
+      FOREIGN KEY (current_player)
+        REFERENCES users(id)
+        ON DELETE SET NULL,
+      FOREIGN KEY (winner)
+        REFERENCES users(id)
+        ON DELETE SET NULL,
       CONSTRAINT different_ids CHECK (player_1_id != player_2_id),
-      CONSTRAINT check_state_length CHECK (length(state) = 36)
+      CONSTRAINT check_state_length CHECK (length(state) = 36),
+      CONSTRAINT check_current_player (current_player = player_1_id OR current_player = player_2_id),
+      CONSTRAINT check_players_colors (player_1_color != player_2_color)
     )
     `
   );
