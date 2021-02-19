@@ -9,7 +9,7 @@ export default function GameCanvas({
   useWarning,
   switchPlayers,
 }) {
-  let { currentGame: game, updateCurrentGame: updateGame } = useGames();
+  let { currentGame, setCurrentGame } = useGames();
   let [winner, updateWinner] = useWinner();
   let [warning, setWarning] = useWarning();
 
@@ -27,7 +27,7 @@ export default function GameCanvas({
 
     let availableIndex = -1;
     for (let i of [...columnIndicies]) {
-      if (game.state.charAt(i) !== "0") {
+      if (currentGame.state.charAt(i) !== "0") {
         columnIndicies.shift();
       } else {
         availableIndex = i;
@@ -129,13 +129,13 @@ export default function GameCanvas({
     }
 
     col--;
-    const newGameState = game.state.split("").map((a) => parseInt(a));
+    const newGameState = currentGame.state.split("").map((a) => parseInt(a));
     const availableIndex = getAvailableIndex(col);
 
     if (availableIndex >= 0) {
       newGameState[availableIndex] = playerColor;
       const newGameStateStr = newGameState.join("");
-      updateGame((p) => ({ ...p, state: newGameStateStr }));
+      setCurrentGame((p) => ({ ...p, state: newGameStateStr }));
       const msg = isMoveWinning(newGameStateStr)
         ? `${playerColor} is a winner`
         : "There is no winner yet";
@@ -148,7 +148,7 @@ export default function GameCanvas({
 
   return (
     <div className="game-container">
-      {game.state
+      {currentGame.state
         .split("")
         .map((a) => parseInt(a))
         .map((s, i) => (
