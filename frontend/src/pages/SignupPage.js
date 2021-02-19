@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./SignupPage.css";
-import { useHistory } from "react-router-dom";
 import { useUsers } from "../contexts/UsersContext";
 
 export default function SignupPage() {
@@ -9,7 +8,6 @@ export default function SignupPage() {
   
   let [name, setName] = useState("");
   let [error, setError] = useState("");
-  const history = useHistory();
 
   function handleChange(e) {
     setName(e.target.value);
