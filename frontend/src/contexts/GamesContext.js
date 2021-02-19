@@ -2,9 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 
 const initialGamesValue = {
   currentGame: {},
-  updateCurrentGame: () => {},
   prevGames: [],
-  updatePrevGames: () => {},
 };
 
 const GamesContext = createContext(initialGamesValue);
@@ -17,28 +15,17 @@ export default function GamesProvider({ children, value: inheritedValue }) {
     inheritedValue.prevGames || initialGamesValue.prevGames
   );
 
-  const updateCurrentGame = (newGame) => {
-    setCurrentGame((p) => {
-      localStorage.setItem("currentGame", JSON.stringify(newGame));
-      return newGame;
-    });
-  };
-
-  const updatePrevGames = (newGamesList) => {
-    setPrevGames((p) => {
-      localStorage.setItem("prevGames", JSON.stringify(newGamesList));
-      return newGamesList;
-    });
-  };
-
-  const value = {
-    currentGame,
-    updateCurrentGame,
-    prevGames,
-    updatePrevGames,
-  };
   return (
-    <GamesContext.Provider value={value}>{children}</GamesContext.Provider>
+    <GamesContext.Provider
+      value={{
+        currentGame,
+        setCurrentGame,
+        prevGames,
+        setPrevGames,
+      }}
+    >
+      {children}
+    </GamesContext.Provider>
   );
 }
 
