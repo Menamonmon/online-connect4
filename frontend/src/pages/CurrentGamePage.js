@@ -1,23 +1,68 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GameCanvas from "../components/Game";
 import GameCell from "../components/GameCell";
 import { useGames } from "../contexts/GamesContext";
 import { useUsers } from "../contexts/UsersContext";
 
+const evaluateUsersColors = (currentUser, invitedUser, game) => {
+  const colors = {
+    currentUserColor: null,
+    invitedUserColor: null,
+  };
+
+  if (game.player_1_id === currentUser.id) {
+    colors.currentUserColor = game.player_1_color;
+  } else if (game.player_1_id === invitedUser.id) {
+    colors.invitedUserColor = game.player_1_color;
+  }
+
+  if (game.player_2_id === currentUser.id) {
+    if (colors.currentUserColor) {
+      throw Error(
+        "The game does not have distinct user id's for user 1 and user 2"
+      );
+    }
+
+    colors.currentUserColor = game.player_2_color;
+  } else if (game.player_2_id === invitedUser.id) {
+    if (colors.invitedUserColor) {
+      throw Error(
+        "The game does not have distinct user id's for user 1 and user 2"
+      );
+    }
+
+    colors.invitedUserColor = game.player_2_color;
+  }
+
+  if (
+    !colors.currentUserColor ||
+    !colors.invitedUserColor ||
+    colors.currentUserColor === colors.invitedUserColor
+  ) {
+    throw Error(
+      `Problem with matching the user colors (${JSON.stringify(
+        colors,
+        null,
+        2
+      )})`
+    );
+  }
+  return colors;
+};
+
 export default function CurrentGamePage() {
   const { currentUser, invitedUser } = useUsers();
-  let { currentGame: game, updateGame } = useGames();
+  let { currentGame, setCurrentGame } = useGames();
+  let [currentPlayer, setCurrentPlayer] = useState({});
+  let [{ currentUserColor, invitedUserColor }, setUserColors] = useState({});
 
-  const currentUserColor =
-    game.player_1_id === currentUser.id
-      ? game.player_1_color
-      : game.player_2_color;
-  const invitedUserColor =
-    game.player_1_id === invitedUser.id
-      ? game.player_1_color
-      : game.player_2_color;
-  const currentPlayer =
-    game.current_player === currentUser.id ? currentUser : invitedUser;
+  useEffect(() => {
+    const currentPlayer =
+      currentGame.current_player === currentUser.id ? currentUser : invitedUser;
+
+    setCurrentPlayer(currentPlayer);
+    setUserColors(evaluateUsersColors(currentUser, invitedUser, currentGame));
+  }, [currentGame]);
 
   const [winner, setWinner] = useState(null);
   const [warning, setWarning] = useState(
@@ -25,7 +70,10 @@ export default function CurrentGamePage() {
       ? "This is your turn"
       : "This is your opponent's turn"
   );
+
   const infoStyle = { color: "green", margin: 0 };
+  console.log("CURRENT PLAYER:", currentPlayer);
+  console.log("CURRENT USER:", currentUser);
 
   return (
     <div className="game-page-container">
@@ -73,13 +121,14 @@ export default function CurrentGamePage() {
         </div>
       </div>
       <GameCanvas
-        game={game}
-        updateGame={updateGame}
         useWinner={() => [winner, setWinner]}
         useWarning={() => [warning, setWarning]}
-        playerColor={currentUser === currentPlayer ? currentUserColor : null}
+        playerColor={
+          currentUser.id === currentPlayer.id ? currentUserColor : null
+          // currentUserColor
+        }
         switchPlayers={() => {
-          // updateGame((p) => ({ ...p, current_player: invitedUser.id }));
+          // setCurrentGame((p) => ({ ...p, current_player: invitedUser.id }));
         }}
       />
     </div>
