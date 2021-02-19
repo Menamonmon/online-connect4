@@ -66,8 +66,8 @@ async function createTables(pool) {
       created_at TIMESTAMP DEFAULT NOW(),
       ended_at TIMESTAMP,
       current_player INT NOT NULL,
-      player_1_color INT NOT NULL,
-      player_2_color INT NOT NULL,
+      player_1_color cellstatus NOT NULL,
+      player_2_color cellstatus NOT NULL,
       winner INT DEFAULT NULL
       FOREIGN KEY (player_1_id)
         REFERENCES users(id)
