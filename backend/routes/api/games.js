@@ -28,31 +28,28 @@ router.get("/user/:id", async (request, response) => {
 
 router.put("/:id", async (request, response) => {
   const gameId = request.params.id;
-  const { newState, newStatus } = request.body;
-  let newGame = {};
+  const newGame = request.body;
+  if (newGame.id !== undefined || newGame.id !== null) {
+    if (gameId !== newGame.id) {
+      response
+        .status(400)
+        .json({ msg: "The game ID must match the URL parameter ID" });
+      return;
+    }
 
-  if (newState) {
-    try {
-      newGame = await db.updateGameState(gameId, newState);
-    } catch (err) {
-      response.status(400).json({ msg: err.message });
-      return;
-    }
-  } else if (newStatus) {
-    try {
-      newGame = await db.updateGameStatus(gameId, newStatus);
-    } catch (err) {
-      response.status(400).json({ msg: err.message });
-      return;
-    }
+    delete newGame.id;
   }
-  if (newState || newStatus) {
-    response.status(200).json(newGame);
+
+  const updatedGame = {};
+
+  try {
+    updatedGame = await db.updateGame(gameId, newGame);
+  } catch (err) {
+    response.status(400).json({ msg: err.message });
     return;
   }
-  response.status(400).json({
-    msg: "You can only update either the state or the status of the game",
-  });
+
+  response.status(200).json(updatedGame);
 });
 
 module.exports = router;
