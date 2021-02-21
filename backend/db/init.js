@@ -36,13 +36,16 @@ async function createEnumType(pool, typename, typeValuesArray) {
   }
 }
 
-async function createTables(pool) {
+async function createEnumTypes(pool) {
   // Creating the ENUM Types for representing the states for the game and the user
   await createEnumType(pool, "userstatus", Object.values(types.user));
   await createEnumType(pool, "gamestatus", Object.values(types.game));
   await createEnumType(pool, "cellstatus", Object.values(types.cell));
 
   console.log("ENUM TYPES CREATED");
+}
+
+async function createTables(pool) {
   await pool.query(
     `
     CREATE TABLE IF NOT EXISTS users (
@@ -91,4 +94,9 @@ async function createTables(pool) {
   console.log("GAME TABLE CREATED");
 }
 
-module.exports = { createTables };
+async function initDB(pool) {
+  await createEnumTypes(pool);
+  await createTables(pool);
+}
+
+module.exports = { initDB };

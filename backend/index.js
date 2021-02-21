@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
+const { initializeDatabase } = require("./db/queries");
 const app = express();
 
 app.use(cors());
@@ -20,6 +21,7 @@ app.get("/", (_, response) => {
 });
 
 const PORT = process.env.APP_PORT;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await initializeDatabase();
   console.log(`Starting Server At Port (${PORT})`);
 });

@@ -1,6 +1,6 @@
 require("dotenv").config({ path: __dirname + "./../.env" });
 const types = require("./types");
-const { createTables } = require("./init");
+const { initDB } = require("./init");
 const { Pool } = require("pg");
 
 const pool = new Pool({
@@ -10,8 +10,6 @@ const pool = new Pool({
   port: process.env.PSQL_PORT,
   database: process.env.PSQL_DB,
 });
-
-createTables(pool);
 
 async function getUserById(id) {
   const results = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
@@ -136,7 +134,12 @@ async function createGame(player1Id, player2Id) {
   return results.rows[0];
 }
 
+async function initializeDatabase() {
+  await initDB(pool);
+}
+
 module.exports = {
+  initializeDatabase,
   users: {
     getUserById,
     getActiveUsers,
