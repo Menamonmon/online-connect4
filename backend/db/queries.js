@@ -14,7 +14,7 @@ const pool = new Pool({
 async function getUserById(id) {
   const results = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
   if (results.rowCount !== 1) {
-    throw Error(`User with id "${id}" is not found`);
+    throw new Error(`User with id "${id}" is not found`);
   }
   return results.rows[0];
 }
@@ -34,7 +34,7 @@ async function createUser(name) {
     [name]
   );
   if (results.rowCount === 0) {
-    throw Error("Problem with creating user");
+    throw new Error("Problem with creating user");
   }
   return results.rows[0];
 }
@@ -46,7 +46,7 @@ async function deleteUser(id) {
   );
 
   if (results.rowCount !== 1) {
-    throw Error("Problem with deleting user");
+    throw new Error("Problem with deleting user");
   }
 
   return results.rows[0];
@@ -58,14 +58,14 @@ async function updateUserName(id, newName) {
     [newName, id]
   );
   if (results.rowCount !== 1) {
-    throw Error("Problem with updating user");
+    throw new Error("Problem with updating user");
   }
   return results.rows[0];
 }
 
 async function updateUserStatus(id, newStatus) {
   if (!Object.values(types.user).includes(newStatus)) {
-    throw Error("Invalid User State Type");
+    throw new Error("Invalid User State Type");
   }
 
   const results = await pool.query(
@@ -74,7 +74,7 @@ async function updateUserStatus(id, newStatus) {
   );
 
   if (results.rowCount !== 1) {
-    throw Error("Problem with updating user's status");
+    throw new Error("Problem with updating user's status");
   }
 
   return results.rows[0];
@@ -95,7 +95,7 @@ async function getGameById(gameId) {
   ]);
 
   if (results.rowCount !== 1) {
-    throw Error("Invalid Game ID");
+    throw new Error("Invalid Game ID");
   }
 
   return results.rows[0];
@@ -120,7 +120,7 @@ async function updateGame(gameId, newGame) {
   }
 
   if (!validateGame(newGame)) {
-    throw Error("Invalid game shape");
+    throw new Error("Invalid game shape");
   }
 
   let results = null;
@@ -136,7 +136,7 @@ async function updateGame(gameId, newGame) {
   }
 
   if (results.rowCount !== 1) {
-    throw Error("Invalid Game ID");
+    throw new Error("Invalid Game ID");
   }
 
   return results.rows[0];
@@ -149,7 +149,7 @@ async function createGame(player1Id, player2Id) {
   );
 
   if (results.rowCount !== 1) {
-    throw Error("Game cannot be created");
+    throw new Error("Game cannot be created");
   }
 
   return results.rows[0];
