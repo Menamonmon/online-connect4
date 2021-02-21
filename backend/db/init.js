@@ -59,7 +59,7 @@ async function createTables(pool) {
     `
     CREATE TABLE IF NOT EXISTS games (
       id SERIAL PRIMARY KEY NOT NULL,
-      player_1_id INT NOT NULL ,
+      player_1_id INT NOT NULL,
       player_2_id INT NOT NULL,
       state VARCHAR(36) NOT NULL DEFAULT '${INITIAL_GAME_STATE}',
       status gamestatus NOT NULL DEFAULT '${DEFAULT_GAME_STATUS}',
@@ -68,7 +68,7 @@ async function createTables(pool) {
       current_player INT NOT NULL,
       player_1_color cellstatus NOT NULL,
       player_2_color cellstatus NOT NULL,
-      winner INT DEFAULT NULL
+      winner INT,
       FOREIGN KEY (player_1_id)
         REFERENCES users(id)
         ON DELETE SET NULL,
@@ -83,8 +83,8 @@ async function createTables(pool) {
         ON DELETE SET NULL,
       CONSTRAINT different_ids CHECK (player_1_id != player_2_id),
       CONSTRAINT check_state_length CHECK (length(state) = 36),
-      CONSTRAINT check_current_player (current_player = player_1_id OR current_player = player_2_id),
-      CONSTRAINT check_players_colors (player_1_color != player_2_color)
+      CONSTRAINT check_current_player CHECK (current_player = player_1_id OR current_player = player_2_id),
+      CONSTRAINT check_players_colors CHECK (player_1_color != player_2_color)
     )
     `
   );
