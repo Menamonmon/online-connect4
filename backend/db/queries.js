@@ -89,33 +89,54 @@ async function getGamesByPlayerId(playerId) {
   return results.rows;
 }
 
-async function updateGameState(gameId, newState) {
-  const results = await pool.query(
-    "UPDATE games SET state = $1 WHERE id = $2 RETURNING *",
-    [newState, gameId]
-  );
+async function getGameById(gameId) {
+  const results = await pool.query("SELECT * FROM games WHERE id = $1", [
+    gameId,
+  ]);
 
   if (results.rowCount !== 1) {
-    throw Error("Invalid game ID or state does not match requirements");
+    throw Error("Invalid Game ID");
   }
 
   return results.rows[0];
 }
 
-async function updateGameStatus(gameId, newStatus) {
-  const results =
-    newStatus === types.game.ENDED
-      ? await pool.query(
-          "UPDATE games SET status = $1, ended_at = NOW() WHERE id = $2 RETURNING *",
-          [newStatus, gameId]
-        )
-      : await pool.query(
-          "UPDATE games SET status = $1 WHERE id = $2 RETURNING *",
-          [newStatus, gameId]
-        );
+async function updateGame(gameId, newGame) {
+  function validateGame(newGame) {
+    const mutables = ["state", "status", "current_player", "winner"];
+    if (newGame.keys().any((a) => !mutables.includes(a))) {
+      return false;
+    } else if (newGame.status) {
+      if (!types.game.values().includes(newGame.stauts)) {
+        return false;
+      }
+    } else if (newGame.state) {
+      const uniqueCellsSet = new Set(newGame.state.split("")).values();
+      const uniqueCells = Array(...uniqueCellsSet);
+      if (uniqueCells.any((a) => !types.cell.values().includes(a))) {
+        return false;
+      }
+    }
+  }
+
+  if (!validateGame(newGame)) {
+    throw Error("Invalid game shape");
+  }
+
+  let results = null;
+  for (const [key, value] of Object.entries(newGame)) {
+    results = await pool.query(
+      `UPDATE games SET ${key} = $1 WHERE id = $2 RETURNING *`,
+      [value, gameId]
+    );
+  }
+
+  if (results === null) {
+    results = await getGameById(gameId);
+  }
 
   if (results.rowCount !== 1) {
-    throw Error("Invalid game ID or state does not match requirements");
+    throw Error("Invalid Game ID");
   }
 
   return results.rows[0];
@@ -150,8 +171,8 @@ module.exports = {
   },
   games: {
     getGamesByPlayerId,
+    getGameById,
     createGame,
-    updateGameState,
-    updateGameStatus,
+    updateGame,
   },
 };
