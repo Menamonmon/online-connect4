@@ -104,16 +104,16 @@ async function getGameById(gameId) {
 async function updateGame(gameId, newGame) {
   function validateGame(newGame) {
     const mutables = ["state", "status", "current_player", "winner"];
-    if (newGame.keys().any((a) => !mutables.includes(a))) {
+    if (Object.keys(newGame).any((a) => !mutables.includes(a))) {
       return false;
     } else if (newGame.status) {
-      if (!types.game.values().includes(newGame.stauts)) {
+      if (!Object.values(types.game).includes(newGame.stauts)) {
         return false;
       }
     } else if (newGame.state) {
       const uniqueCellsSet = new Set(newGame.state.split("")).values();
       const uniqueCells = Array(...uniqueCellsSet);
-      if (uniqueCells.any((a) => !types.cell.values().includes(a))) {
+      if (uniqueCells.any((a) => !Object.values(types.cell).includes(a))) {
         return false;
       }
     }
