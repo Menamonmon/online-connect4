@@ -1,4 +1,4 @@
-import React, { createContext, useContext,  useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 const initialUsersState = {
   currentUser: {},
@@ -7,16 +7,10 @@ const initialUsersState = {
 };
 const UsersContext = createContext(initialUsersState);
 
-export default function UsersProvider({ children, value: inheritedValue }) {
-  const [currentUser, setCurrentUser] = useState(
-    inheritedValue.currentUser || initialUsersState.currentUser
-  );
-  const [invitedUser, setInvitedUser] = useState(
-    inheritedValue.invitedUser || initialUsersState.invitedUser
-  );
-  const [activeUsers, setActiveUsers] = useState(
-    inheritedValue.activeUsers || initialUsersState.activeUsers
-  );
+export default function UsersProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState(initialUsersState.currentUser);
+  const [invitedUser, setInvitedUser] = useState(initialUsersState.invitedUser);
+  const [activeUsers, setActiveUsers] = useState(initialUsersState.activeUsers);
 
   return (
     <UsersContext.Provider
