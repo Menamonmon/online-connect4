@@ -30,7 +30,14 @@ export default function Routes() {
 
   return (
     <Switch>
-      <Route exact strict path="/" component={CurrentGamePage}/>
+      <ProtectedRoute
+        exact
+        strict
+        path="/"
+        isAuthenticated={() => false}
+        redirectPath="/signup"
+        component={() => <></>}
+      />
       <ProtectedRoute
         exact
         strict
