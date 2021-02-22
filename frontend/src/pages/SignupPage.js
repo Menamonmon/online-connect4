@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import axios from "axios";
 import "./SignupPage.css";
+import api from "../requests/api";
 import { useUsers } from "../contexts/UsersContext";
+import { useSocket } from "../contexts/SocketConext";
 
 export default function SignupPage() {
-  let { updateCurrentUser: updateUser } = useUsers();
-  
+  let { setCurrentUser } = useUsers();
+
   let [name, setName] = useState("");
   let [error, setError] = useState("");
+  const socket = useSocket(); 
 
   function handleChange(e) {
     setName(e.target.value);
@@ -15,22 +17,20 @@ export default function SignupPage() {
   }
 
   async function submitForm(e) {
-    let response = {};
+    e.preventDefault();
+    let newUser = {};
 
     try {
-      response = await axios.post("http://localhost:5000/users/signup", {
-        name,
-      });
+      newUser = await api.signupUser({ name });
     } catch (err) {
       setError(err.response.data.msg);
-      e.preventDefault();
       return;
     }
 
-    const newUser = await response.data;
-    updateUser(newUser);
-    // history.push("/users-list");
-    e.preventDefault();
+    setCurrentUser(newUser);
+    console.log(newUser);
+    socket.auth = { user: newUser };
+    socket.connect();
   }
 
   return (
