@@ -41,8 +41,8 @@ function App() {
   return (
     <div className="App">
       <TypesProvider>
-        <UsersProvider value={{ currentUser, invitedUser }}>
-          <GamesProvider value={{ currentGame: game }}>
+        <UsersProvider>
+          <GamesProvider>
             <Router>
               <Routes />
             </Router>
