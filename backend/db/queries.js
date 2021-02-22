@@ -11,12 +11,29 @@ const pool = new Pool({
   database: process.env.PSQL_DB,
 });
 
+const areUsersEqual = (user1, user2) =>
+  JSON.stringify(user1) === JSON.stringify(user2);
+
 async function getUserById(id) {
   const results = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
   if (results.rowCount !== 1) {
     throw new Error(`User with id "${id}" is not found`);
   }
   return results.rows[0];
+}
+
+async function doesUserExist(user) {
+  let existingUser = null;
+  try {
+    existingUser = await getUserById(user.id);
+  } catch (err) {
+    return false;
+  }
+
+  if (existingUser === null || !areUsersEqual(existingUser, user)) {
+    return false;
+  }
+  return true;
 }
 
 async function getActiveUsers(currentUserId) {
@@ -164,6 +181,7 @@ module.exports = {
   users: {
     getUserById,
     getActiveUsers,
+    doesUserExist,
     createUser,
     updateUserName,
     updateUserStatus,
