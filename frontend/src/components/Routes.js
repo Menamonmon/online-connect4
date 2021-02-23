@@ -26,7 +26,7 @@ export default function Routes() {
       currentGame: !isObjectEmpty(currentGame),
     };
     setExists(newExists);
-  }, []);
+  }, [currentUser, invitedUser, currentGame]);
 
   return (
     <Switch>
