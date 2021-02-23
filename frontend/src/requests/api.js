@@ -6,7 +6,9 @@ const apiClient = axios.create({
 });
 
 async function signupUser(userData) {
-  return await apiClient.post("/users/signup", userData);
+  const res = await apiClient.post("/users/signup", userData);
+  const data = await res.data;
+  return data;
 }
 
 async function getGameListForUser(userId) {
@@ -25,12 +27,19 @@ async function getTypes() {
   return await apiClient.get("/types");
 }
 
+async function getSocketEvents() {
+  const res = await apiClient.get("/socket-events");
+  const events = await res.data;
+  return events;
+}
+
 const api = {
   signupUser,
   getGameListForUser,
   getActiveUsersList,
   createGame,
   getTypes,
+  getSocketEvents,
 };
 
 export default api;
