@@ -9,7 +9,7 @@ export default function SignupPage() {
 
   let [name, setName] = useState("");
   let [error, setError] = useState("");
-  const socket = useSocket(); 
+  const { socket } = useSocket();
 
   function handleChange(e) {
     setName(e.target.value);
