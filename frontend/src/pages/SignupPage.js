@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./SignupPage.css";
 import api from "../requests/api";
 import { useUsers } from "../contexts/UsersContext";
@@ -28,7 +28,6 @@ export default function SignupPage() {
     }
 
     setCurrentUser(newUser);
-    console.log(newUser);
     socket.auth = { user: newUser };
     socket.connect();
   }
