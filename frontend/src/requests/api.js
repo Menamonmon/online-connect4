@@ -27,19 +27,12 @@ async function getTypes() {
   return await apiClient.get("/types");
 }
 
-async function getSocketEvents() {
-  const res = await apiClient.get("/socket-events");
-  const events = await res.data;
-  return events;
-}
-
 const api = {
   signupUser,
   getGameListForUser,
   getActiveUsersList,
   createGame,
   getTypes,
-  getSocketEvents,
 };
 
 export default api;
