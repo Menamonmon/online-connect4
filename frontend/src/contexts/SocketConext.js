@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { io } from "socket.io-client";
-import api from "../requests/api";
+import { useUsers } from "./UsersContext";
 
 const URL = "http://localhost:5000";
 const socket = io(URL, { autoConnect: false });
@@ -8,20 +8,19 @@ const socket = io(URL, { autoConnect: false });
 const SocketContext = createContext();
 
 export default function SocketProvider({ children }) {
-  const [socketEvents, setSocketEvents] = useState({});
-  useEffect(() => {
-    async function fetchSocketEventsData() {
-      const socketEventsData = await api.getSocketEvents();
-      setSocketEvents(socketEventsData);
-    }
+  const { currentUser, setActiveUsers } = useUsers();
 
-    fetchSocketEventsData();
-  }, []);
+  useEffect(() => {
+    socket.on("auu", (users) => {
+      console.log(users);
+      setActiveUsers(users);
+    });
+  }, [setActiveUsers, currentUser]);
+
   return (
     <SocketContext.Provider
       value={{
         socket,
-        socketEvents,
       }}
     >
       {children}
