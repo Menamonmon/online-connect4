@@ -13,17 +13,17 @@ import "./App.css";
 function App() {
   return (
     <div className="App">
-      <SocketProvider>
-        <TypesProvider>
-          <UsersProvider>
-            <GamesProvider>
+      <TypesProvider>
+        <UsersProvider>
+          <GamesProvider>
+            <SocketProvider>
               <Router>
                 <Routes />
               </Router>
-            </GamesProvider>
-          </UsersProvider>
-        </TypesProvider>
-      </SocketProvider>
+            </SocketProvider>
+          </GamesProvider>
+        </UsersProvider>
+      </TypesProvider>
     </div>
   );
 }
