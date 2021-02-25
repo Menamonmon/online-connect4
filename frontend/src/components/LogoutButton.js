@@ -10,7 +10,6 @@ export default function LogoutButton() {
     <button
       onClick={() => {
         setCurrentUser({});
-        socket.emit("logout");
         socket.disconnect();
       }}
       className="logout-btn"

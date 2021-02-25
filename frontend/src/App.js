@@ -9,6 +9,7 @@ import GamesProvider from "./contexts/GamesContext";
 import SocketProvider from "./contexts/SocketConext";
 
 import "./App.css";
+import LogoutButton from "./components/LogoutButton";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <UsersProvider>
           <GamesProvider>
             <SocketProvider>
+              <LogoutButton />
               <Router>
                 <Routes />
               </Router>
