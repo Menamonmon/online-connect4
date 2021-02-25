@@ -25,7 +25,6 @@ io.use(async (socket, next) => {
     socket.user = { ...user, socketID: socket.id };
     next();
   }
-
   return next(new Error("invalid user object"));
 });
 
@@ -39,6 +38,7 @@ const broadcastActiveUsers = (sockets, users) => {
     );
   }
 };
+
 io.on("connection", async (socket) => {
   // going through all of the users in the current socket and adding them to a list that would be updated for all the users
   const { user: currentUser } = socket;
@@ -56,19 +56,6 @@ io.on("connection", async (socket) => {
   // broadcasting the signal to all of the sockets so that it's updated
   broadcastActiveUsers(io.sockets.sockets, activeUsers);
 
-  // An event for handling the logout from the session
-  socket.on("logout", () => {
-    for (let i = 0; i < activeUsers.length; i++) {
-      let user = activeUsers[i];
-      if (user.socketID === socket.id) {
-        activeUsers.splice(i, 1);
-        console.log("USER LOGGED OUT");
-        // broadcasing a list of the udapted active users
-        broadcastActiveUsers(io.sockets.sockets, activeUsers);
-      }
-    }
-  });
-
   socket.on("cuu", (updatedUser) => {
     for (let i = 0; i < activeUsers.length; i++) {
       let user = activeUsers[i];
@@ -79,10 +66,18 @@ io.on("connection", async (socket) => {
       }
     }
   });
-});
 
-io.on("disconnect", (currentUser) => {
-  console.log(currentUser);
+  socket.on("disconnect", () => {
+    for (let i = 0; i < activeUsers.length; i++) {
+      let user = activeUsers[i];
+      if (user.socketID === socket.id) {
+        activeUsers.splice(i, 1);
+        console.log("USER LOGGED OUT");
+        // broadcasing a list of the udapted active users
+        broadcastActiveUsers(io.sockets.sockets, activeUsers);
+      }
+    }
+  });
 });
 
 app.use(cors());
