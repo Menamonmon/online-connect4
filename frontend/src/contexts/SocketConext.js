@@ -8,14 +8,14 @@ const socket = io(URL, { autoConnect: false });
 const SocketContext = createContext();
 
 export default function SocketProvider({ children }) {
-  const { currentUser, setActiveUsers } = useUsers();
+  const { currentUser, setActiveUsers, setCurrentUser } = useUsers();
 
   useEffect(() => {
     socket.on("auu", (users) => {
       console.log(users);
       setActiveUsers(users);
     });
-  }, [setActiveUsers, currentUser]);
+  }, [setActiveUsers, setCurrentUser]);
 
   return (
     <SocketContext.Provider
