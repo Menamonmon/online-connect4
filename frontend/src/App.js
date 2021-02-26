@@ -13,6 +13,7 @@ import "./App.css";
 import LogoutButton from "./components/LogoutButton";
 import NotificationSystem from "react-notification-system";
 import Modal from "react-modal";
+import Navbar from "./components/Navbar";
 
 function App() {
   const notificationRef = useRef(null);
@@ -29,7 +30,7 @@ function App() {
           <UsersProvider>
             <GamesProvider>
               <SocketProvider>
-                <LogoutButton />
+                <Navbar />
                 <Router>
                   <Routes />
                 </Router>
