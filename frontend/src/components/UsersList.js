@@ -1,18 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useUsers } from "../contexts/UsersContext";
 import UsersListItem from "./UsersListItem";
+import InviteUserModal from "./InviteUserModal";
+import { useSocket } from "../contexts/SocketConext";
 
 export default function UsersList() {
-  let { activeUsers: users, setInvitedUser } = useUsers();
+  const { activeUsers: users, setInvitedUser } = useUsers();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
-    <li className="users-list">
-      {users.map((user) => (
-        <UsersListItem
-          user={user}
-          onClick={() => setInvitedUser(user)}
-          key={`user-${user.id}`}
-        />
-      ))}
-    </li>
+    <div>
+      <li className="users-list">
+        {users.map((user) => (
+          <UsersListItem
+            user={user}
+            onInvite={() => {
+              setInvitedUser(user);
+              setIsModalOpen(true);
+            }}
+            key={`user-${user.id}`}
+          />
+        ))}
+      </li>
+      <InviteUserModal isOpen={isModalOpen} setOpen={setIsModalOpen} />
+    </div>
   );
 }
