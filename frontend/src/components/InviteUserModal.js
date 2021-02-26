@@ -3,26 +3,33 @@ import Modal from "react-modal";
 import { useSocket } from "../contexts/SocketConext";
 import { useUsers } from "../contexts/UsersContext";
 
+const invitationStatusValues = {
+  PENDING: "Pending Invitation Acceptance",
+  ACCEPTED: "Invitation Accepted",
+  REJECTED: "Invitation Rejected",
+};
+
 export default function InviteUserModal({ isOpen, setOpen }) {
   const { invitedUser, setInvitedUser } = useUsers();
   const { socket } = useSocket();
-  const [invitationStatus, setInvitationStatus] = useState("Pending invitation");
-  // 2 => pending
-  // 1 => accepted
-  // 0 => rejected
-
+  const [invitationStatus, setInvitationStatus] = useState(
+    invitationStatusValues.PENDING
+  );
 
   return (
     <Modal
       isOpen={isOpen}
+      onAfterClose={() => {
+        setInvitationStatus(invitationStatusValues.PENDING);
+      }}
       onAfterOpen={() => {
         socket.emit("invite user", invitedUser);
 
         const inviteAcceptedHandler = () => {
           setTimeout(() => {
             setOpen(false);
-          }, 10000)
-          setInvitationStatus("Invitation Accepted");
+          }, 3000);
+          setInvitationStatus(invitationStatusValues.ACCEPTED);
           socket.off("invited user accepted invite", inviteAcceptedHandler);
           socket.off("invited user rejected invite", inviteRejectedHandler);
         };
@@ -30,9 +37,9 @@ export default function InviteUserModal({ isOpen, setOpen }) {
         const inviteRejectedHandler = () => {
           setTimeout(() => {
             setOpen(false);
-          }, 10000)
+          }, 3000);
           setInvitedUser({});
-          setInvitationStatus("Invitation Rejected");
+          setInvitationStatus(invitationStatusValues.REJECTED);
           socket.off("invited user accepted invite", inviteAcceptedHandler);
           socket.off("invited user rejected invite", inviteRejectedHandler);
         };
