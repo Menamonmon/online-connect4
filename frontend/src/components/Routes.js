@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Switch } from "react-router-dom";
 import { useGames } from "../contexts/GamesContext";
 import { useUsers } from "../contexts/UsersContext";
 import CurrentGamePage from "../pages/CurrentGamePage";
 import SignupPage from "../pages/SignupPage";
-import UserInvitePage from "../pages/UserInvitePage";
 import { isObjectEmpty } from "../utils/utils";
 import ProtectedRoute from "./ProtectedRoute";
 import UsersList from "./UsersList";
@@ -53,16 +52,6 @@ export default function Routes() {
         isAuthenticated={() => exists.currentUser}
         redirectPath="/signup"
         component={UsersList}
-      />
-      <ProtectedRoute
-        exact
-        strict
-        path="/invite-user"
-        isAuthenticated={() =>
-          exists.invitedUser && exists.currentUser && !exists.currentGame
-        }
-        redirectPath={exists.currentGame ? "/game" : "/signup"}
-        component={UserInvitePage}
       />
       <ProtectedRoute
         exact
