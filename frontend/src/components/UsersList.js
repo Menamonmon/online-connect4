@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useUsers } from "../contexts/UsersContext";
 import UsersListItem from "./UsersListItem";
 import InviteUserModal from "./InviteUserModal";
-import { useSocket } from "../contexts/SocketConext";
 
 export default function UsersList() {
   const { activeUsers: users, setInvitedUser } = useUsers();
