@@ -7,6 +7,7 @@ const types = require("./db/types");
 const {
   initializeDatabase,
   users: { doesUserExist },
+  games: gamesDB,
 } = require("./db/queries");
 const app = express();
 const httpServer = require("http").createServer(app);
@@ -39,11 +40,44 @@ const broadcastActiveUsers = (sockets, users) => {
   }
 };
 
+const initializeGame = async (currentUserSocket, invitedUserSocket) => {
+  const [player1, player2] = [currentUserSocket.user, invitedUserSocket.user];
+  let game = null;
+  try {
+    game = await gamesDB.createGame(player1.id, player2.id);
+  } catch (err) {
+    console.log(err);
+  }
+
+  if (game === null) {
+    invitedUserSocket.emit("connection_error");
+    currentUserSocket.emit("connection_error");
+    console.log(
+      `ERROR IN CREATING GAME FOR USERS: ${player1.id} and ${player2.id}`
+    );
+  }
+
+  const gameRoomName = `game:${game.id}`;
+  currentUserSocket.leave("lobby");
+  invitedUserSocket.leave("lobby");
+  currentUserSocket.join(gameRoomName);
+  invitedUserSocket.join(gameRoom);
+  currentUserSocket.emit("game created", {
+    currentUser: player1,
+    invitedUser: player2,
+  });
+  invitedUserSocket.emit("game created", {
+    currentUser: player2,
+    invitedUser: player1,
+  });
+};
+
 io.on("connection", async (socket) => {
   // going through all of the users in the current socket and adding them to a list that would be updated for all the users
   const { user: currentUser } = socket;
-  for (const [_, currentSocket] of io.sockets.sockets) {
-    let { user } = currentSocket;
+  socket.join("lobby");
+  for (const [_, invitedUserSocket] of io.in("lobby").of("/").sockets) {
+    let { user } = invitedUserSocket;
     if (
       user &&
       user.status === types.user.ACTIVE &&
@@ -54,7 +88,7 @@ io.on("connection", async (socket) => {
     }
   }
   // broadcasting the signal to all of the sockets so that it's updated
-  broadcastActiveUsers(io.sockets.sockets, activeUsers);
+  broadcastActiveUsers(io.in("lobby").of("/").sockets, activeUsers);
 
   socket.on("cuu", (updatedUser) => {
     for (let i = 0; i < activeUsers.length; i++) {
@@ -62,7 +96,7 @@ io.on("connection", async (socket) => {
       if (user.id === updatedUser.id) {
         activeUsers[i] = updatedUser;
         // broadcasing a list of the udapted active users
-        broadcastActiveUsers(io.sockets.sockets, activeUsers);
+        broadcastActiveUsers(io.in("lobby").of("/").sockets, activeUsers);
         break;
       }
     }
@@ -75,32 +109,37 @@ io.on("connection", async (socket) => {
         activeUsers.splice(i, 1);
         console.log("USER LOGGED OUT");
         // broadcasing a list of the udapted active users
-        broadcastActiveUsers(io.sockets.sockets, activeUsers);
+        broadcastActiveUsers(io.in("lobby").of("/").sockets, activeUsers);
         break;
       }
     }
   });
 
   socket.on("invite user", (invitedUser) => {
-    for (const [socketID, currentSocket] of io.sockets.sockets) {
+    for (const [socketID, invitedUserSocket] of io.sockets.sockets) {
       if (socketID === invitedUser.socketID) {
         // If this is the socket for the invitedUser then notify that user's client about the invitation
-        currentSocket.emit("notify of invite", socket.user);
+        invitedUserSocket.emit("notify of invite", socket.user);
 
         // Event handlers for the acceptance and rejection of invite
-        const inviteAcceptedHandler = () => {
+        const inviteAcceptedHandler = async () => {
           socket.emit("invited user accepted invite");
-          currentSocket.off("invite accepted", inviteAcceptedHandler);
-          currentSocket.off("invite rejected", inviteAcceptedHandler);
+
+          // initializing the game once the user accepts the invitation
+          initializeGame(socket, invitedUserSocket);
+
+          invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
+          invitedUserSocket.off("invite rejected", inviteAcceptedHandler);
         };
-        currentSocket.on("invite accepted", inviteAcceptedHandler);
+        invitedUserSocket.on("invite accepted", inviteAcceptedHandler);
 
         const inviteRejectedHandler = () => {
           socket.emit("invited user rejected invite");
-          currentSocket.off("invite rejected", inviteAcceptedHandler);
-          currentSocket.off("invite accepted", inviteAcceptedHandler);
+          invitedUserSocket.off("invite rejected", inviteAcceptedHandler);
+          invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
         };
-        currentSocket.on("invite rejected", inviteRejectedHandler);
+        invitedUserSocket.on("invite rejected", inviteRejectedHandler);
+        break;
       }
     }
   });
