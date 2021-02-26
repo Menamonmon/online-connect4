@@ -63,6 +63,7 @@ io.on("connection", async (socket) => {
         activeUsers[i] = updatedUser;
         // broadcasing a list of the udapted active users
         broadcastActiveUsers(io.sockets.sockets, activeUsers);
+        break;
       }
     }
   });
@@ -75,6 +76,31 @@ io.on("connection", async (socket) => {
         console.log("USER LOGGED OUT");
         // broadcasing a list of the udapted active users
         broadcastActiveUsers(io.sockets.sockets, activeUsers);
+        break;
+      }
+    }
+  });
+
+  socket.on("invite user", (invitedUser) => {
+    for (const [socketID, currentSocket] of io.sockets.sockets) {
+      if (socketID === invitedUser.socketID) {
+        // If this is the socket for the invitedUser then notify that user's client about the invitation
+        currentSocket.emit("notify of invite", socket.user);
+
+        // Event handlers for the acceptance and rejection of invite
+        const inviteAcceptedHandler = () => {
+          socket.emit("invited user accepted invite");
+          currentSocket.off("invite accepted", inviteAcceptedHandler);
+          currentSocket.off("invite rejected", inviteAcceptedHandler);
+        };
+        currentSocket.on("invite accepted", inviteAcceptedHandler);
+
+        const inviteRejectedHandler = () => {
+          socket.emit("invited user rejected invite");
+          currentSocket.off("invite rejected", inviteAcceptedHandler);
+          currentSocket.off("invite accepted", inviteAcceptedHandler);
+        };
+        currentSocket.on("invite rejected", inviteRejectedHandler);
       }
     }
   });
