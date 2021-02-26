@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import Routes from "./components/Routes";
@@ -12,12 +12,18 @@ import NotificationProvider from "./contexts/NotificaitonsContext";
 import "./App.css";
 import LogoutButton from "./components/LogoutButton";
 import NotificationSystem from "react-notification-system";
+import Modal from "react-modal";
 
 function App() {
   const notificationRef = useRef(null);
+  const appElement = useRef(null);
+
+  useEffect(() => {
+    Modal.setAppElement(appElement.current);
+  });
 
   return (
-    <div className="App">
+    <div className="App" ref={appElement}>
       <NotificationProvider value={notificationRef}>
         <TypesProvider>
           <UsersProvider>
