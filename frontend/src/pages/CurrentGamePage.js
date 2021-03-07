@@ -3,6 +3,7 @@ import GameCanvas from "../components/Game";
 import GameCell from "../components/GameCell";
 import { useGames } from "../contexts/GamesContext";
 import { useUsers } from "../contexts/UsersContext";
+import { isObjectEmpty } from "../utils/utils";
 
 const evaluateUsersColors = (currentUser, invitedUser, game) => {
   const colors = {
@@ -52,17 +53,24 @@ const evaluateUsersColors = (currentUser, invitedUser, game) => {
 
 export default function CurrentGamePage() {
   const { currentUser, invitedUser } = useUsers();
-  let { currentGame, setCurrentGame } = useGames();
+  let { currentGame } = useGames();
   let [currentPlayer, setCurrentPlayer] = useState({});
   let [{ currentUserColor, invitedUserColor }, setUserColors] = useState({});
 
   useEffect(() => {
+    if (
+      isObjectEmpty(currentGame) ||
+      isObjectEmpty(currentUser) ||
+      isObjectEmpty(invitedUser)
+    ) {
+      return;
+    }
     const currentPlayer =
       currentGame.current_player === currentUser.id ? currentUser : invitedUser;
 
     setCurrentPlayer(currentPlayer);
     setUserColors(evaluateUsersColors(currentUser, invitedUser, currentGame));
-  }, [currentGame]);
+  }, [currentGame, currentUser, invitedUser]);
 
   const [winner, setWinner] = useState(null);
   const [warning, setWarning] = useState(
@@ -72,10 +80,10 @@ export default function CurrentGamePage() {
   );
 
   const infoStyle = { color: "green", margin: 0 };
-  console.log("CURRENT PLAYER:", currentPlayer);
-  console.log("CURRENT USER:", currentUser);
 
-  return (
+  return isObjectEmpty(currentGame) ? (
+    <h1>Ending the game because one of the plyers left</h1>
+  ) : (
     <div className="game-page-container">
       <div
         className="game-page-header"
