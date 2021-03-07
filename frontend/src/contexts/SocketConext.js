@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect } from "react";
 import { io } from "socket.io-client";
+import { useGames } from "./GamesContext";
 import { useNotification } from "./NotificaitonsContext";
 import { useUsers } from "./UsersContext";
 
@@ -17,7 +18,8 @@ const InviteActionButtonsStyles = {
 };
 
 export default function SocketProvider({ children }) {
-  const { setActiveUsers, setCurrentUser } = useUsers();
+  const { setActiveUsers, setCurrentUser, setInvitedUser } = useUsers();
+  const { setCurrentGame } = useGames();
   const notificationRef = useNotification();
 
   useEffect(() => {
@@ -62,7 +64,34 @@ export default function SocketProvider({ children }) {
         ),
       });
     });
-  }, [setActiveUsers, setCurrentUser, notificationRef]);
+
+    socket.on(
+      "game created",
+      ({ game, currentUser: newCurrentUser, invitedUser: newInvitedUser }) => {
+        setCurrentGame(game);
+        setCurrentUser(newCurrentUser);
+        setInvitedUser(newInvitedUser);
+      }
+    );
+
+    socket.on("game has ended", () => {
+      setCurrentGame({});
+      setInvitedUser({});
+    });
+
+    socket.on("disconnect", () => {
+      setCurrentGame({});
+      setInvitedUser({});
+      setCurrentUser({});
+      setActiveUsers([]);
+    });
+  }, [
+    setActiveUsers,
+    setCurrentUser,
+    setInvitedUser,
+    notificationRef,
+    setCurrentGame,
+  ]);
 
   return (
     <SocketContext.Provider
