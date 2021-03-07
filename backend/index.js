@@ -124,23 +124,9 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("disconnecting", () => {
-    console.log("USER SOCKET ROOMS FOR USER BEIGN LOGGED OUT: ", socket.rooms);
-    endGameHandler(socket);
-  });
-
-  socket.on("disconnect", () => {
-    for (let i = 0; i < activeUsers.length; i++) {
-      let user = activeUsers[i];
-      if (user.socketID === socket.id) {
-        activeUsers.splice(i, 1);
-        console.log("USER LOGGED OUT");
-
-        // broadcasing a list of the udapted active users
-        broadcastActiveUsers(io.in("lobby").of("/").sockets, activeUsers);
-        break;
-      }
-    }
+  socket.on("update game", (newGame) => {
+    const gameRoomName = `game:${newGame.id}`;
+    socket.to(gameRoomName).emit("game has changed", newGame);
   });
 
   socket.on("invite user", (invitedUser) => {
@@ -167,6 +153,25 @@ io.on("connection", async (socket) => {
           invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
         };
         invitedUserSocket.on("invite rejected", inviteRejectedHandler);
+        break;
+      }
+    }
+  });
+
+  socket.on("disconnecting", () => {
+    console.log("USER SOCKET ROOMS FOR USER BEIGN LOGGED OUT: ", socket.rooms);
+    endGameHandler(socket);
+  });
+
+  socket.on("disconnect", () => {
+    for (let i = 0; i < activeUsers.length; i++) {
+      let user = activeUsers[i];
+      if (user.socketID === socket.id) {
+        activeUsers.splice(i, 1);
+        console.log("USER LOGGED OUT");
+
+        // broadcasing a list of the udapted active users
+        broadcastActiveUsers(io.in("lobby").of("/").sockets, activeUsers);
         break;
       }
     }
