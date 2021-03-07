@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import GameCanvas from "../components/Game";
 import GameCell from "../components/GameCell";
 import { useGames } from "../contexts/GamesContext";
+import { useSocket } from "../contexts/SocketConext";
 import { useUsers } from "../contexts/UsersContext";
 import { isObjectEmpty } from "../utils/utils";
 
@@ -53,9 +54,10 @@ const evaluateUsersColors = (currentUser, invitedUser, game) => {
 
 export default function CurrentGamePage() {
   const { currentUser, invitedUser } = useUsers();
-  let { currentGame } = useGames();
-  let [currentPlayer, setCurrentPlayer] = useState({});
-  let [{ currentUserColor, invitedUserColor }, setUserColors] = useState({});
+  const { currentGame } = useGames();
+  const [currentPlayer, setCurrentPlayer] = useState({});
+  const [{ currentUserColor, invitedUserColor }, setUserColors] = useState({});
+  const socket = useSocket();
 
   useEffect(() => {
     if (
@@ -71,6 +73,10 @@ export default function CurrentGamePage() {
     setCurrentPlayer(currentPlayer);
     setUserColors(evaluateUsersColors(currentUser, invitedUser, currentGame));
   }, [currentGame, currentUser, invitedUser]);
+
+  useEffect(() => {
+    socket.emit("update game")
+  }, [currentGame, socket])
 
   const [winner, setWinner] = useState(null);
   const [warning, setWarning] = useState(
