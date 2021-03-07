@@ -25,7 +25,7 @@ export default function Routes() {
       currentGame: !isObjectEmpty(currentGame),
     };
     setExists(newExists);
-  }, [currentUser, invitedUser, currentGame]);
+  }, [currentUser, invitedUser, currentGame, setExists]);
 
   return (
     <Switch>
@@ -57,7 +57,9 @@ export default function Routes() {
         exact
         strict
         path="/game"
-        isAuthenticated={() => exists.currentGame}
+        isAuthenticated={() =>
+          exists.currentGame && exists.currentUser && exists.invitedUser
+        }
         redirectPath="/signup"
         component={CurrentGamePage}
       />
