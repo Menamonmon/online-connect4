@@ -9,7 +9,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import UsersList from "./UsersList";
 
 export default function Routes() {
-  const { currentUser, invitedUser } = useUsers();
+  const { currentUser, invitedUser, activeUsers } = useUsers();
   const { currentGame } = useGames();
 
   let [exists, setExists] = useState({
@@ -25,7 +25,7 @@ export default function Routes() {
       currentGame: !isObjectEmpty(currentGame),
     };
     setExists(newExists);
-  }, [currentUser, invitedUser, currentGame, setExists]);
+  }, [currentUser, invitedUser, currentGame, activeUsers, setExists]);
 
   return (
     <Switch>
