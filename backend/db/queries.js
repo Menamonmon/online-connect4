@@ -161,8 +161,8 @@ async function updateGame(gameId, newGame) {
 
 async function createGame(player1Id, player2Id) {
   const results = await pool.query(
-    "INSERT INTO games (player_1_id, player_2_id) VALUES ($1, $2)RETURNING *",
-    [player1Id, player2Id]
+    "INSERT INTO games (player_1_id, player_2_id, current_player) VALUES ($1, $2, $3) RETURNING *",
+    [player1Id, player2Id, player1Id]
   );
 
   if (results.rowCount !== 1) {
