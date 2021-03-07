@@ -61,15 +61,37 @@ const initializeGame = async (currentUserSocket, invitedUserSocket) => {
   currentUserSocket.leave("lobby");
   invitedUserSocket.leave("lobby");
   currentUserSocket.join(gameRoomName);
-  invitedUserSocket.join(gameRoom);
+  invitedUserSocket.join(gameRoomName);
   currentUserSocket.emit("game created", {
+    game,
     currentUser: player1,
     invitedUser: player2,
   });
   invitedUserSocket.emit("game created", {
+    game,
     currentUser: player2,
     invitedUser: player1,
   });
+};
+
+const endGameHandler = (socket) => {
+  // taking the user out of all the game rooms and notifying the rest of the users in the room that the game ended
+  for (const room of socket.rooms) {
+    if (room.startsWith("game")) {
+      // leaving the room and notifying all of the other players in the
+      // room that the game was ended because one of the users left
+      io.in(room).sockets.emit("game has ended");
+      console.log(io.in(room).sockets);
+      for (const [id, currentSocket] of io.in(room).sockets.sockets) {
+        if (id === socket.id) {
+          currentSocket.leave(room);
+        } else {
+          currentSocket.leave(room);
+          currentSocket.join("lobby");
+        }
+      }
+    }
+  }
 };
 
 io.on("connection", async (socket) => {
@@ -102,12 +124,18 @@ io.on("connection", async (socket) => {
     }
   });
 
+  socket.on("disconnecting", () => {
+    console.log("USER SOCKET ROOMS FOR USER BEIGN LOGGED OUT: ", socket.rooms);
+    endGameHandler(socket);
+  });
+
   socket.on("disconnect", () => {
     for (let i = 0; i < activeUsers.length; i++) {
       let user = activeUsers[i];
       if (user.socketID === socket.id) {
         activeUsers.splice(i, 1);
         console.log("USER LOGGED OUT");
+
         // broadcasing a list of the udapted active users
         broadcastActiveUsers(io.in("lobby").of("/").sockets, activeUsers);
         break;
@@ -126,7 +154,7 @@ io.on("connection", async (socket) => {
           socket.emit("invited user accepted invite");
 
           // initializing the game once the user accepts the invitation
-          initializeGame(socket, invitedUserSocket);
+          await initializeGame(socket, invitedUserSocket);
 
           invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
           invitedUserSocket.off("invite rejected", inviteAcceptedHandler);
