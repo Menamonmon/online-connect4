@@ -1,9 +1,5 @@
 import React from "react";
-import axios from 'axios';
 
-export default function GamesPage({ user }) {
-  await axios.get()  
-  return (
-
-  );
+export default function GamesPages() {
+  return <div>HERE GOES THE LIST OF YOUR PREVIOUS GAMES</div>;
 }
