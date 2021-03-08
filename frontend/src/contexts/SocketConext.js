@@ -75,7 +75,6 @@ export default function SocketProvider({ children }) {
     );
 
     socket.on("game has changed", (newGame) => {
-      console.log("GAME HAS CHANGED");
       setCurrentGame(newGame);
     });
 
