@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const types = require("./db/types");
 const {
@@ -178,10 +177,10 @@ io.on("connection", async (socket) => {
 
 app.use(cors());
 app.use(morgan("dev"));
-app.use(bodyParser.json());
-app.use(bodyParser.raw());
-app.use(bodyParser.text());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.raw());
+app.use(express.text());
+app.use(express.urlencoded({ extended: true }));
 app.use("/types", require("./routes/api/types"));
 app.use("/users", require("./routes/api/users"));
 app.use("/games", require("./routes/api/games"));
