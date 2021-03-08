@@ -4,7 +4,7 @@ import { useGames } from "./GamesContext";
 import { useNotification } from "./NotificaitonsContext";
 import { useUsers } from "./UsersContext";
 
-const URL = "http://localhost:5000";
+const URL = "http://10.0.0.218:5000";
 const socket = io(URL, { autoConnect: false });
 
 const SocketContext = createContext();
