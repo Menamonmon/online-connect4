@@ -5,12 +5,11 @@ import { useUsers } from "../contexts/UsersContext";
 import "./Game.css";
 import GameCell from "./GameCell";
 
-export default function GameCanvas({ playerColor, useWarning, useWinner }) {
+export default function GameCanvas({ playerColor, useWarning }) {
   const { currentGame, setCurrentGame } = useGames();
   const { currentUser, invitedUser } = useUsers();
   const { socket } = useSocket();
-  const [warning, setWarning] = useWarning();
-  const [winner, setWinner] = useWinner();
+  const [_, setWarning] = useWarning();
 
   function calculateColumnIndicies(col) {
     const columnIndicies = [];
@@ -119,8 +118,8 @@ export default function GameCanvas({ playerColor, useWarning, useWinner }) {
     return false;
   }
 
-  function handleClick(e, col) {
-    if (winner) {
+  function handleClick(_, col) {
+    if (currentGame.winner) {
       return;
     } else if (playerColor === null) {
       setWarning("This is not your turn");
