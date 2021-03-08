@@ -1,17 +1,16 @@
 import React from "react";
 import { useGames } from "../contexts/GamesContext";
+import { useSocket } from "../contexts/SocketConext";
+import { useUsers } from "../contexts/UsersContext";
 import "./Game.css";
 import GameCell from "./GameCell";
 
-export default function GameCanvas({
-  playerColor,
-  useWinner,
-  useWarning,
-  switchPlayers,
-}) {
-  let { currentGame, setCurrentGame } = useGames();
-  let [winner, updateWinner] = useWinner();
-  let [warning, setWarning] = useWarning();
+export default function GameCanvas({ playerColor, useWarning, useWinner }) {
+  const { currentGame, setCurrentGame } = useGames();
+  const { currentUser, invitedUser } = useUsers();
+  const { socket } = useSocket();
+  const [warning, setWarning] = useWarning();
+  const [winner, setWinner] = useWinner();
 
   function calculateColumnIndicies(col) {
     const columnIndicies = [];
@@ -37,7 +36,7 @@ export default function GameCanvas({
     return availableIndex;
   }
 
-  function isMoveWinning(gameState, playerColor) {
+  function isMoveWinning(gameState) {
     const isIdentical = (arr) => arr.every((v) => v === arr[0]);
     const getDiagonalArrays = (arr) => {
       const result = [];
@@ -135,12 +134,19 @@ export default function GameCanvas({
     if (availableIndex >= 0) {
       newGameState[availableIndex] = playerColor;
       const newGameStateStr = newGameState.join("");
-      setCurrentGame((p) => ({ ...p, state: newGameStateStr }));
-      const msg = isMoveWinning(newGameStateStr)
-        ? `${playerColor} is a winner`
-        : "There is no winner yet";
-      setWarning(msg);
-      switchPlayers();
+      const isThisAWin = isMoveWinning(newGameStateStr);
+      setCurrentGame((p) => {
+        const newGame = {
+          ...p,
+          state: newGameStateStr,
+          current_player: invitedUser.id,
+        };
+        if (isThisAWin) {
+          newGame.winner = currentUser.id;
+        }
+        socket.emit("update game", newGame);
+        return newGame;
+      });
     } else {
       setWarning("Please choose another column");
     }
