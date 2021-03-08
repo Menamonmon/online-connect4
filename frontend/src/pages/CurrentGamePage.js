@@ -2,62 +2,21 @@ import React, { useEffect, useState } from "react";
 import GameCanvas from "../components/Game";
 import GameCell from "../components/GameCell";
 import { useGames } from "../contexts/GamesContext";
-import { useSocket } from "../contexts/SocketConext";
 import { useUsers } from "../contexts/UsersContext";
-import { isObjectEmpty } from "../utils/utils";
-
-const evaluateUsersColors = (currentUser, invitedUser, game) => {
-  const colors = {
-    currentUserColor: null,
-    invitedUserColor: null,
-  };
-
-  if (game.player_1_id === currentUser.id) {
-    colors.currentUserColor = game.player_1_color;
-  } else if (game.player_1_id === invitedUser.id) {
-    colors.invitedUserColor = game.player_1_color;
-  }
-
-  if (game.player_2_id === currentUser.id) {
-    if (colors.currentUserColor) {
-      throw Error(
-        "The game does not have distinct user id's for user 1 and user 2"
-      );
-    }
-
-    colors.currentUserColor = game.player_2_color;
-  } else if (game.player_2_id === invitedUser.id) {
-    if (colors.invitedUserColor) {
-      throw Error(
-        "The game does not have distinct user id's for user 1 and user 2"
-      );
-    }
-
-    colors.invitedUserColor = game.player_2_color;
-  }
-
-  if (
-    !colors.currentUserColor ||
-    !colors.invitedUserColor ||
-    colors.currentUserColor === colors.invitedUserColor
-  ) {
-    throw Error(
-      `Problem with matching the user colors (${JSON.stringify(
-        colors,
-        null,
-        2
-      )})`
-    );
-  }
-  return colors;
-};
+import { isObjectEmpty, evaluateUsersColors } from "../utils/utils";
 
 export default function CurrentGamePage() {
   const { currentUser, invitedUser } = useUsers();
   const { currentGame } = useGames();
   const [currentPlayer, setCurrentPlayer] = useState({});
   const [{ currentUserColor, invitedUserColor }, setUserColors] = useState({});
-  const socket = useSocket();
+  const [warning, setWarning] = useState(
+    currentUser.id === currentPlayer.id
+      ? "This is your turn"
+      : "This is your opponent's turn"
+  );
+
+  const infoStyle = { color: "green", margin: 0 };
 
   useEffect(() => {
     if (
@@ -73,19 +32,6 @@ export default function CurrentGamePage() {
     setCurrentPlayer(currentPlayer);
     setUserColors(evaluateUsersColors(currentUser, invitedUser, currentGame));
   }, [currentGame, currentUser, invitedUser]);
-
-  useEffect(() => {
-    socket.emit("update game")
-  }, [currentGame, socket])
-
-  const [winner, setWinner] = useState(null);
-  const [warning, setWarning] = useState(
-    currentUser === currentPlayer
-      ? "This is your turn"
-      : "This is your opponent's turn"
-  );
-
-  const infoStyle = { color: "green", margin: 0 };
 
   return isObjectEmpty(currentGame) ? (
     <h1>Ending the game because one of the plyers left</h1>
@@ -129,21 +75,22 @@ export default function CurrentGamePage() {
           <h3 style={{ ...infoStyle, color: "blue" }}>Stats:</h3>
           <h5 style={{ margin: 0 }}>Current Player: {currentPlayer.name}</h5>
           <h5 style={{ margin: 0 }}>
-            {winner ? "There is a winner" : "No Winner Yet"}
+            {currentGame.winner
+              ? `There is a winner (${
+                  currentGame.winner === currentUser.id
+                    ? currentUser.name
+                    : invitedUser.name
+                })`
+              : "No Winner Yet"}
           </h5>
           <h5 style={{ margin: 0 }}>{warning}</h5>
         </div>
       </div>
       <GameCanvas
-        useWinner={() => [winner, setWinner]}
         useWarning={() => [warning, setWarning]}
         playerColor={
-          currentUser.id === currentPlayer.id ? currentUserColor : null
-          // currentUserColor
+          currentPlayer.id === currentUser.id ? currentUserColor : null
         }
-        switchPlayers={() => {
-          // setCurrentGame((p) => ({ ...p, current_player: invitedUser.id }));
-        }}
       />
     </div>
   );
