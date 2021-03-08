@@ -13,7 +13,7 @@ const app = express();
 const httpServer = require("http").createServer(app);
 const socketIOOptions = {
   cors: {
-    origin: "http://localhost:3000",
+    origins: ["http://localhost:3000", "http://10.0.0.218:3000"],
   },
 };
 const io = require("socket.io")(httpServer, socketIOOptions);
