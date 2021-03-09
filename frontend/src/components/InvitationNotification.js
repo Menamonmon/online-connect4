@@ -46,6 +46,7 @@ export default function InvitationNotification({ id }) {
 
 export function addInviteNotification(invitingUser) {
   const notificationID = `notification-for:${invitingUser.name}-(${invitingUser.id})`;
+  removeNotification(notificationID);
   const notification = {
     id: notificationID,
     title: `A new invite has been sent from ${invitingUser.name}`,
