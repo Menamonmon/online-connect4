@@ -76,12 +76,12 @@ export default function CurrentGamePage() {
           <h5 style={{ margin: 0 }}>Current Player: {currentPlayer.name}</h5>
           <h5 style={{ margin: 0 }}>
             {currentGame.winner
-              ? `There is a winner (${
+              ? `${
                   currentGame.winner === currentUser.id
                     ? currentUser.name
                     : invitedUser.name
-                })`
-              : "No Winner Yet"}
+                } is the winner!!!`
+              : "No Winner Yet :("}
           </h5>
           <h5 style={{ margin: 0 }}>{warning}</h5>
         </div>

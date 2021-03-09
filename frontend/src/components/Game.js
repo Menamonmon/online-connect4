@@ -120,9 +120,10 @@ export default function GameCanvas({ playerColor, useWarning }) {
 
   function handleClick(_, col) {
     if (currentGame.winner) {
+      setWarning("There is already a winner!");
       return;
     } else if (playerColor === null) {
-      setWarning("This is not your turn");
+      setWarning("This is not your turn!");
       return;
     }
 
@@ -161,7 +162,7 @@ export default function GameCanvas({ playerColor, useWarning }) {
             state={s}
             index={i}
             onClick={handleClick}
-            key={`game-cell${i}`}
+            key={`game-cell-${i}`}
           />
         ))}
     </div>
