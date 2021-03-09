@@ -2,12 +2,18 @@ import React from "react";
 import { useGames } from "../contexts/GamesContext";
 import { useSocket } from "../contexts/SocketConext";
 import { useUsers } from "../contexts/UsersContext";
+import { useTypes } from "../contexts/TypesContext";
+
 import "./Game.css";
 import GameCell from "./GameCell";
 
 export default function GameCanvas({ playerColor, useWarning }) {
   const { currentGame, setCurrentGame } = useGames();
   const { currentUser, invitedUser } = useUsers();
+  const {
+    cell: { EMPTY: EMPTYCELL },
+  } = useTypes();
+  EMPTYCELL = EMPTYCELL.toString();
   const { socket } = useSocket();
   const [_, setWarning] = useWarning();
 
@@ -25,7 +31,7 @@ export default function GameCanvas({ playerColor, useWarning }) {
 
     let availableIndex = -1;
     for (let i of [...columnIndicies]) {
-      if (currentGame.state.charAt(i) !== "0") {
+      if (currentGame.state.charAt(i) !== EMPTYCELL) {
         columnIndicies.shift();
       } else {
         availableIndex = i;
@@ -86,7 +92,7 @@ export default function GameCanvas({ playerColor, useWarning }) {
       // Checking the horizontal rows
       for (let c = 0; c < 3; c++) {
         let currentRow = state[r].slice(c, c + 4);
-        if (isIdentical(currentRow) && currentRow[0] !== "0") {
+        if (isIdentical(currentRow) && currentRow[0] !== EMPTYCELL) {
           return true;
         }
       }
@@ -97,7 +103,7 @@ export default function GameCanvas({ playerColor, useWarning }) {
         for (let i = 0; i < 4; i++) {
           currentCol.push(state[i + c][r]);
         }
-        if (isIdentical(currentCol) && currentCol[0] !== "0") {
+        if (isIdentical(currentCol) && currentCol[0] !== EMPTYCELL) {
           return true;
         }
       }
@@ -109,7 +115,7 @@ export default function GameCanvas({ playerColor, useWarning }) {
       let k = length - 4;
       for (let i = 0; i < k; i++) {
         let currentArr = arr.slice(i, i + 4);
-        if (isIdentical(currentArr) && currentArr[0] !== "0") {
+        if (isIdentical(currentArr) && currentArr[0] !== EMPTYCELL) {
           return true;
         }
       }
