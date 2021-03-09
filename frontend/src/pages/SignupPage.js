@@ -9,6 +9,7 @@ export default function SignupPage() {
 
   let [name, setName] = useState("");
   let [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { socket } = useSocket();
 
   function handleChange(e) {
@@ -19,17 +20,23 @@ export default function SignupPage() {
   async function submitForm(e) {
     e.preventDefault();
     let newUser = {};
-
+    setLoading(true);
     try {
       newUser = await api.signupUser({ name });
     } catch (err) {
-      setError(err.response.data.msg);
+      if (err.response && err.response.data && err.response.data.msg) {
+        setError(err.response.data.msg);
+      } else {
+        setError("Error with server");
+      }
+      setLoading(false);
       return;
     }
 
     setCurrentUser(newUser);
     socket.auth = { user: newUser };
     socket.connect();
+    setLoading(false);
   }
 
   return (
@@ -47,7 +54,11 @@ export default function SignupPage() {
         onChange={handleChange}
       />
       <br />
-      <button className="signup-submit-btn" onClick={submitForm}>
+      <button
+        className="signup-submit-btn"
+        onClick={submitForm}
+        disabled={loading}
+      >
         Sign Up
       </button>
     </div>

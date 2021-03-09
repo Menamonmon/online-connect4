@@ -39,3 +39,7 @@
   cursor: pointer;
   filter: brightness(1.5);
 }
+
+.signup-submit-btn:disabled {
+  background: black;
+}
