@@ -7,13 +7,13 @@ import { useTypes } from "../contexts/TypesContext";
 import "./Game.css";
 import GameCell from "./GameCell";
 
-export default function GameCanvas({ playerColor, useWarning }) {
+export default function Game({ playerColor, useWarning }) {
   const { currentGame, setCurrentGame } = useGames();
   const { currentUser, invitedUser } = useUsers();
   const {
-    cell: { EMPTY: EMPTYCELL },
+    cell: { EMPTY },
   } = useTypes();
-  EMPTYCELL = EMPTYCELL.toString();
+  const EMPTYCELL = EMPTY.toString();
   const { socket } = useSocket();
   const [_, setWarning] = useWarning();
 

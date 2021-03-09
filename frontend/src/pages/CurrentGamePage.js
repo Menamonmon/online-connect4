@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import GameCanvas from "../components/Game";
+import Game from "../components/Game";
 import GameCell from "../components/GameCell";
 import { useGames } from "../contexts/GamesContext";
 import { useUsers } from "../contexts/UsersContext";
@@ -86,7 +86,7 @@ export default function CurrentGamePage() {
           <h5 style={{ margin: 0 }}>{warning}</h5>
         </div>
       </div>
-      <GameCanvas
+      <Game
         useWarning={() => [warning, setWarning]}
         playerColor={
           currentPlayer.id === currentUser.id ? currentUserColor : null
