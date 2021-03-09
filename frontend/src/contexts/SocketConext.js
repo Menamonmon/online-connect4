@@ -1,7 +1,10 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import {
+  addInviteNotification,
+  removeNotification,
+} from "../components/InvitationNotification";
 import { useGames } from "./GamesContext";
-import { useNotification } from "./NotificaitonsContext";
 import { useUsers } from "./UsersContext";
 
 const URL = "http://10.0.0.218:5000";
@@ -9,18 +12,10 @@ const socket = io(URL, { autoConnect: false });
 
 const SocketContext = createContext();
 
-const InviteActionButtonsStyles = {
-  background: "#5ea400",
-  color: "white",
-  border: "none",
-  margin: "10px",
-  fontSize: "1.2rem",
-};
-
 export default function SocketProvider({ children }) {
   const { setActiveUsers, setCurrentUser, setInvitedUser } = useUsers();
   const { setCurrentGame } = useGames();
-  const notificationRef = useNotification();
+  const [ notificationID, setNotificationID ] = useState(null);
 
   useEffect(() => {
     socket.on("auu", (users) => {
@@ -29,45 +24,11 @@ export default function SocketProvider({ children }) {
 
     socket.on("invite canceled", () => {
       socket.emit("invite rejected");
-      notificationRef.current.clearNotifications();
+      removeNotification(notificationID);
     });
 
     socket.on("notify of invite", (invitingUser) => {
-      notificationRef.current.addNotification({
-        message: `A new invite has been sent from ${invitingUser.name}`,
-        level: "success",
-        autoDismiss: 0,
-        dismissible: "none",
-        children: (
-          <div
-            style={{
-              margin: "10px",
-            }}
-          >
-            <button
-              onClick={() => {
-                socket.emit("invite accepted");
-                notificationRef.current.clearNotifications();
-              }}
-              style={{ ...InviteActionButtonsStyles, background: "#5ea400" }}
-            >
-              Accept
-            </button>
-            <button
-              onClick={() => {
-                socket.emit("invite rejected");
-                notificationRef.current.clearNotifications();
-              }}
-              style={{
-                ...InviteActionButtonsStyles,
-                background: "#ec3d3d",
-              }}
-            >
-              Reject
-            </button>
-          </div>
-        ),
-      });
+      setNotificationID(addInviteNotification(invitingUser));
     });
 
     socket.on(
@@ -98,8 +59,9 @@ export default function SocketProvider({ children }) {
     setActiveUsers,
     setCurrentUser,
     setInvitedUser,
-    notificationRef,
     setCurrentGame,
+    notificationID,
+    setNotificationID,
   ]);
 
   return (
