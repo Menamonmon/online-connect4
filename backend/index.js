@@ -28,13 +28,18 @@ io.use(async (socket, next) => {
   return next(new Error("invalid user object"));
 });
 
-const activeUsers = [];
-
-const broadcastActiveUsers = (sockets, users) => {
+const broadcastActiveUsers = (sockets) => {
+  const users = [];
+  for (const [_, socket] of sockets) {
+    users.push(socket.user);
+  }
   for (const [_, socket] of sockets) {
     socket.emit(
       "auu",
-      users.filter((u) => u.socketID !== socket.user.socketID)
+      users.filter(
+        (u) =>
+          u.socketID !== socket.user.socketID && u.status === types.user.ACTIVE
+      )
     );
   }
 };
@@ -86,37 +91,27 @@ const endGameHandler = (socket) => {
         } else {
           currentSocket.leave(room);
           currentSocket.join("lobby");
+          currentSocket.user.status = types.user.ACTIVE;
+          broadcastActiveUsers(io.in("lobby").of("/").sockets);
         }
       }
     }
+    socket.leave(room);
   }
 };
 
 io.on("connection", async (socket) => {
   // going through all of the users in the current socket and adding them to a list that would be updated for all the users
-  const { user: currentUser } = socket;
   socket.join("lobby");
-  for (const [_, invitedUserSocket] of io.in("lobby").of("/").sockets) {
-    let { user } = invitedUserSocket;
-    if (
-      user &&
-      user.status === types.user.ACTIVE &&
-      user.socketID === currentUser.socketID
-    ) {
-      console.log("USER CONNECTED");
-      activeUsers.push(user);
-    }
-  }
   // broadcasting the signal to all of the sockets so that it's updated
-  broadcastActiveUsers(io.in("lobby").of("/").sockets, activeUsers);
+  broadcastActiveUsers(io.in("lobby").of("/").sockets);
 
   socket.on("cuu", (updatedUser) => {
-    for (let i = 0; i < activeUsers.length; i++) {
-      let user = activeUsers[i];
-      if (user.id === updatedUser.id) {
-        activeUsers[i] = updatedUser;
-        // broadcasing a list of the udapted active users
-        broadcastActiveUsers(io.in("lobby").of("/").sockets, activeUsers);
+    for (const [id, s] of io.in("lobby").of("/").sockets) {
+      if (id === updatedUser.id) {
+        s.user = updatedUser;
+        console.log("USER UPDATED");
+        broadcastActiveUsers(io.in("lobby").of("/").sockets);
         break;
       }
     }
@@ -128,9 +123,16 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("invite user", (invitedUser) => {
-    for (const [socketID, invitedUserSocket] of io.sockets.sockets) {
+    for (const [socketID, invitedUserSocket] of io.in("lobby").of("/")
+      .sockets) {
       if (socketID === invitedUser.socketID) {
         // If this is the socket for the invitedUser then notify that user's client about the invitation
+        // Switching the users to inactive temporarily so that they don't appear on the
+        // active users list for the others
+        socket.user.status = types.user.INACTIVE;
+        invitedUserSocket.user.status = types.user.INACTIVE;
+        broadcastActiveUsers(io.in("lobby").of("/").sockets);
+
         invitedUserSocket.emit("notify of invite", socket.user);
 
         // Event handlers for the acceptance and rejection of invite
@@ -141,13 +143,19 @@ io.on("connection", async (socket) => {
           await initializeGame(socket, invitedUserSocket);
 
           invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
-          invitedUserSocket.off("invite rejected", inviteAcceptedHandler);
+          invitedUserSocket.off("invite rejected", inviteRejectedHandler);
         };
         invitedUserSocket.on("invite accepted", inviteAcceptedHandler);
 
         const inviteRejectedHandler = () => {
           socket.emit("invited user rejected invite");
-          invitedUserSocket.off("invite rejected", inviteAcceptedHandler);
+
+          // Reactivating the status for the users if the invite is rejected
+          socket.user.status = types.user.ACTIVE;
+          invitedUserSocket.user.status = types.user.ACTIVE;
+          broadcastActiveUsers(io.in("lobby").of("/").sockets);
+
+          invitedUserSocket.off("invite rejected", inviteRejectedHandler);
           invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
         };
         invitedUserSocket.on("invite rejected", inviteRejectedHandler);
@@ -161,17 +169,10 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("disconnect", () => {
-    for (let i = 0; i < activeUsers.length; i++) {
-      let user = activeUsers[i];
-      if (user.socketID === socket.id) {
-        activeUsers.splice(i, 1);
-        console.log("USER LOGGED OUT");
+    console.log("USER LOGGED OUT");
 
-        // broadcasing a list of the udapted active users
-        broadcastActiveUsers(io.in("lobby").of("/").sockets, activeUsers);
-        break;
-      }
-    }
+    // broadcasing a list of the udapted active users
+    broadcastActiveUsers(io.in("lobby").of("/").sockets);
   });
 });
 
