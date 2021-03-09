@@ -159,6 +159,12 @@ io.on("connection", async (socket) => {
           invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
         };
         invitedUserSocket.on("invite rejected", inviteRejectedHandler);
+        invitedUserSocket.on("disconnect", inviteRejectedHandler); // reject when invited user is disconnected
+
+        // set a timeout for user to accept invite so that the other user does not wait forever
+        setTimeout(() => {
+          invitedUserSocket.emit("invite canceled");
+        }, 120000);
         break;
       }
     }

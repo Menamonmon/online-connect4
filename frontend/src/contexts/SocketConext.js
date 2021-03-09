@@ -27,6 +27,11 @@ export default function SocketProvider({ children }) {
       setActiveUsers(users);
     });
 
+    socket.on("invite canceled", () => {
+      socket.emit("invite rejected");
+      notificationRef.current.clearNotifications();
+    });
+
     socket.on("notify of invite", (invitingUser) => {
       notificationRef.current.addNotification({
         message: `A new invite has been sent from ${invitingUser.name}`,
