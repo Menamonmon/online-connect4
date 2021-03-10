@@ -65,6 +65,23 @@ export default function SocketProvider({ children }) {
       setInvitedUser({});
     });
 
+    socket.on("error with saving game", (message) => {
+      const endgameErrorNotification = {
+        title: "Error With Saving Game",
+        message,
+        type: "danger",
+        insert: "top",
+        container: "top-right",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      };
+      store.addNotification(endgameErrorNotification);
+    });
+
     socket.on("disconnect", () => {
       setCurrentGame({});
       setInvitedUser({});
