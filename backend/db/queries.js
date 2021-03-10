@@ -121,31 +121,43 @@ async function getGameById(gameId) {
 async function updateGame(gameId, newGame) {
   function validateGame(newGame) {
     const mutables = ["state", "status", "current_player", "winner"];
-    if (Object.keys(newGame).any((a) => !mutables.includes(a))) {
+    if (Object.keys(newGame).some((a) => !mutables.includes(a))) {
+      invalidCause = "One of the fields is immutable and can't be updated";
       return false;
     } else if (newGame.status) {
-      if (!Object.values(types.game).includes(newGame.stauts)) {
+      if (!Object.values(types.game).includes(newGame.status)) {
+        invalidCause = "Invalid game status value";
         return false;
       }
     } else if (newGame.state) {
       const uniqueCellsSet = new Set(newGame.state.split("")).values();
       const uniqueCells = Array(...uniqueCellsSet);
-      if (uniqueCells.any((a) => !Object.values(types.cell).includes(a))) {
+      if (uniqueCells.some((a) => !Object.values(types.cell).includes(a))) {
+        invalidCause = "One of the cell values are invalid";
         return false;
       }
     }
+
+    return true;
   }
 
   if (!validateGame(newGame)) {
-    throw new Error("Invalid game shape");
+    throw new Error(`Invalid Game Shape: ${invalidCause}`);
   }
 
   let results = null;
   for (const [key, value] of Object.entries(newGame)) {
-    results = await pool.query(
-      `UPDATE games SET ${key} = $1 WHERE id = $2 RETURNING *`,
-      [value, gameId]
-    );
+    if (key === "status" && value === types.game.ENDED) {
+      results = await pool.query(
+        `UPDATE games SET ${key} = $1, ended_at = $2 WHERE id = $3 RETURNING *`,
+        [value, new Date().toISOString(), gameId]
+      );
+    } else {
+      results = await pool.query(
+        `UPDATE games SET ${key} = $1 WHERE id = $2 RETURNING *`,
+        [value, gameId]
+      );
+    }
   }
 
   if (results === null) {
