@@ -129,7 +129,6 @@ export default function Game({ playerColor, useWarning }) {
       setWarning("There is already a winner!");
       return;
     } else if (playerColor === null) {
-      setWarning("This is not your turn!");
       return;
     }
 

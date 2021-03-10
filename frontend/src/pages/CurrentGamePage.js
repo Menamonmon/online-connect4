@@ -52,6 +52,15 @@ export default function CurrentGamePage() {
       currentGame.current_player === currentUser.id ? currentUser : invitedUser;
 
     setCurrentPlayer(currentPlayer);
+    if (currentGame.winner) {
+      setWarning("There is a winner already!!");
+    } else {
+      setWarning(
+        currentPlayer.id === currentUser.id
+          ? "This is your turn"
+          : "This is your opponent's turn."
+      );
+    }
     setUserColors(evaluateUsersColors(currentUser, invitedUser, currentGame));
   }, [currentGame, currentUser, invitedUser]);
 
