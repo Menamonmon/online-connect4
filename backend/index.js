@@ -78,7 +78,7 @@ const initializeGame = async (currentUserSocket, invitedUserSocket) => {
   });
 };
 
-const endGameHandler = (socket) => {
+const endGameHandler = (socket, finalGame) => {
   // taking the user out of all the game rooms and notifying the rest of the users in the room that the game ended
   for (const room of socket.rooms) {
     if (room.startsWith("game")) {
@@ -93,6 +93,17 @@ const endGameHandler = (socket) => {
         }
       }
     }
+  }
+  console.log(finalGame);
+  if (finalGame && finalGame !== {}) {
+    const gameID = finalGame.id;
+    updatedGame = {
+      state: finalGame.state,
+      status: types.game.ENDED,
+      current_player: finalGame.current_player,
+      winner: finalGame.winner,
+    };
+    gamesDB.updateGame(gameID, updatedGame);
   }
 };
 
@@ -170,11 +181,12 @@ io.on("connection", async (socket) => {
     }, 120000);
   });
 
-  socket.on("end game", () => {
-    endGameHandler(socket);
+  socket.on("end game", (finalGame) => {
+    endGameHandler(socket, finalGame);
     for (const room of socket.rooms) {
       if (room !== "lobby") socket.leave(room);
     }
+    console.log(finalGame.id);
     socket.emit("clear game");
     socket.user.status = types.user.ACTIVE;
     broadcastActiveUsers(io.in("lobby").of("/").sockets);
