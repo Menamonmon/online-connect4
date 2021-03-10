@@ -65,6 +65,11 @@ export default function SocketProvider({ children }) {
       setInvitedUser({});
     });
 
+    socket.on("clear game", () => {
+      setCurrentGame({});
+      setInvitedUser({});
+    });
+
     socket.on("disconnect", () => {
       setCurrentGame({});
       setInvitedUser({});

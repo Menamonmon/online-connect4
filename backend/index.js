@@ -86,16 +86,18 @@ const endGameHandler = (socket) => {
       // room that the game was ended because one of the users left
       socket.to(room).emit("game has ended");
       for (const [id, currentSocket] of io.in(room).sockets.sockets) {
-        if (id === socket.id) {
-          currentSocket.leave(room);
-        } else {
+        if (id !== socket.id) {
           currentSocket.leave(room);
           currentSocket.join("lobby");
           currentSocket.user.status = types.user.ACTIVE;
-          broadcastActiveUsers(io.in("lobby").of("/").sockets);
         }
       }
     }
+  }
+};
+
+const logoutSocket = (socket) => {
+  for (const room of socket.rooms) {
     socket.leave(room);
   }
 };
@@ -170,8 +172,19 @@ io.on("connection", async (socket) => {
     }
   });
 
+  socket.on("end game", () => {
+    endGameHandler(socket);
+    for (const room of socket.rooms) {
+      if (room !== "lobby") socket.leave(room);
+    }
+    socket.emit("clear game");
+    socket.user.status = types.user.ACTIVE;
+    broadcastActiveUsers(io.in("lobby").of("/").sockets);
+  });
+
   socket.on("disconnecting", () => {
     endGameHandler(socket);
+    logoutSocket(socket);
   });
 
   socket.on("disconnect", () => {
