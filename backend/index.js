@@ -76,6 +76,8 @@ const initializeGame = async (currentUserSocket, invitedUserSocket) => {
     currentUser: player2,
     invitedUser: player1,
   });
+  currentUserSocket.game = game;
+  invitedUserSocket.game = game;
 };
 
 const endGameHandler = async (socket, finalGame) => {
@@ -144,6 +146,9 @@ io.on("connection", async (socket) => {
   socket.on("update game", (newGame) => {
     const gameRoomName = `game:${newGame.id}`;
     socket.to(gameRoomName).emit("game has changed", newGame);
+    for (const [id, socket] of io.in(gameRoomName).of("/").sockets) {
+      socket.game = newGame;
+    }
   });
 
   socket.on("invite user", (invitedUser) => {
@@ -204,13 +209,13 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("disconnecting", async () => {
-    await endGameHandler(socket);
+    console.log(socket.game);
+    await endGameHandler(socket, socket.game);
     logoutSocket(socket);
   });
 
   socket.on("disconnect", () => {
     console.log("USER LOGGED OUT");
-
     // broadcasing a list of the udapted active users
     broadcastActiveUsers(io.in("lobby").of("/").sockets);
   });
