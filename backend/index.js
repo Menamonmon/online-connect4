@@ -231,7 +231,7 @@ app.use("/types", require("./routes/api/types"));
 app.use("/users", require("./routes/api/users"));
 app.use("/games", require("./routes/api/games"));
 
-const PORT = process.env.APP_PORT;
+const PORT = process.env.PORT || process.env.APP_PORT;
 httpServer.listen(PORT, async () => {
   await initializeDatabase();
   console.log(`Starting Server At Port (${PORT})`);
