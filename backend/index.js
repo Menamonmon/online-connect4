@@ -84,7 +84,7 @@ const endGameHandler = (socket) => {
     if (room.startsWith("game")) {
       // leaving the room and notifying all of the other players in the
       // room that the game was ended because one of the users left
-      io.in(room).sockets.emit("game has ended");
+      socket.to(room).emit("game has ended");
       for (const [id, currentSocket] of io.in(room).sockets.sockets) {
         if (id === socket.id) {
           currentSocket.leave(room);

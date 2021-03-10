@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { store } from "react-notifications-component";
 import { io } from "socket.io-client";
 import {
   addInviteNotification,
@@ -15,7 +16,7 @@ const SocketContext = createContext();
 export default function SocketProvider({ children }) {
   const { setActiveUsers, setCurrentUser, setInvitedUser } = useUsers();
   const { setCurrentGame } = useGames();
-  const [ notificationID, setNotificationID ] = useState(null);
+  const [notificationID, setNotificationID] = useState(null);
 
   useEffect(() => {
     socket.on("auu", (users) => {
@@ -45,6 +46,22 @@ export default function SocketProvider({ children }) {
     });
 
     socket.on("game has ended", () => {
+      const gameEndNotification = {
+        title: "Game Ended",
+        message:
+          "The game was ended because the other player either left the game or logged out of his account",
+        type: "warning",
+        insert: "top",
+        container: "top-right",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      };
+      console.log("GAME HAS ENDED");
+      store.addNotification(gameEndNotification);
       setCurrentGame({});
       setInvitedUser({});
     });
