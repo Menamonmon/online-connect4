@@ -78,23 +78,10 @@ const initializeGame = async (currentUserSocket, invitedUserSocket) => {
   });
 };
 
-const endGameHandler = (socket, finalGame) => {
-  // taking the user out of all the game rooms and notifying the rest of the users in the room that the game ended
-  for (const room of socket.rooms) {
-    if (room.startsWith("game")) {
-      // leaving the room and notifying all of the other players in the
-      // room that the game was ended because one of the users left
-      socket.to(room).emit("game has ended");
-      for (const [id, currentSocket] of io.in(room).sockets.sockets) {
-        if (id !== socket.id) {
-          currentSocket.leave(room);
-          currentSocket.join("lobby");
-          currentSocket.user.status = types.user.ACTIVE;
-        }
-      }
-    }
-  }
+const endGameHandler = async (socket, finalGame) => {
   console.log(finalGame);
+  let isErrorWithSaving = false;
+  let error = null;
   if (finalGame && finalGame !== {}) {
     const gameID = finalGame.id;
     updatedGame = {
@@ -103,7 +90,31 @@ const endGameHandler = (socket, finalGame) => {
       current_player: finalGame.current_player,
       winner: finalGame.winner,
     };
-    gamesDB.updateGame(gameID, updatedGame);
+    try {
+      await gamesDB.updateGame(gameID, updatedGame);
+    } catch (err) {
+      isErrorWithSaving = true;
+      error = err.message;
+    }
+  }
+
+  // taking the user out of all the game rooms and notifying the rest of the users in the room that the game ended
+  for (const room of socket.rooms) {
+    if (room.startsWith("game")) {
+      // leaving the room and notifying all of the other players in the
+      // room that the game was ended because one of the users left
+      socket.to(room).emit("game has ended");
+      if (isErrorWithSaving) {
+        io.in(room).emit("error with saving game", error);
+      }
+      for (const [id, currentSocket] of io.in(room).sockets.sockets) {
+        if (id !== socket.id) {
+          currentSocket.leave(room);
+          currentSocket.join("lobby");
+          currentSocket.user.status = types.user.ACTIVE;
+        }
+      }
+    }
   }
 };
 
@@ -181,8 +192,8 @@ io.on("connection", async (socket) => {
     }, 120000);
   });
 
-  socket.on("end game", (finalGame) => {
-    endGameHandler(socket, finalGame);
+  socket.on("end game", async (finalGame) => {
+    await endGameHandler(socket, finalGame);
     for (const room of socket.rooms) {
       if (room !== "lobby") socket.leave(room);
     }
@@ -192,8 +203,8 @@ io.on("connection", async (socket) => {
     broadcastActiveUsers(io.in("lobby").of("/").sockets);
   });
 
-  socket.on("disconnecting", () => {
-    endGameHandler(socket);
+  socket.on("disconnecting", async () => {
+    await endGameHandler(socket);
     logoutSocket(socket);
   });
 
