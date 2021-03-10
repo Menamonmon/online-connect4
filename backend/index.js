@@ -125,51 +125,49 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("invite user", (invitedUser) => {
-    for (const [socketID, invitedUserSocket] of io.in("lobby").of("/")
-      .sockets) {
-      if (socketID === invitedUser.socketID) {
-        // If this is the socket for the invitedUser then notify that user's client about the invitation
-        // Switching the users to inactive temporarily so that they don't appear on the
-        // active users list for the others
-        socket.user.status = types.user.INACTIVE;
-        invitedUserSocket.user.status = types.user.INACTIVE;
-        broadcastActiveUsers(io.in("lobby").of("/").sockets);
+    const invitedUserSocket = io
+      .in("lobby")
+      .of("/")
+      .sockets.get(invitedUser.socketID);
+    // If this is the socket for the invitedUser then notify that user's client about the invitation
+    // Switching the users to inactive temporarily so that they don't appear on the
+    // active users list for the others
+    socket.user.status = types.user.INACTIVE;
+    invitedUserSocket.user.status = types.user.INACTIVE;
+    broadcastActiveUsers(io.in("lobby").of("/").sockets);
 
-        invitedUserSocket.emit("notify of invite", socket.user);
+    invitedUserSocket.emit("notify of invite", socket.user);
 
-        // Event handlers for the acceptance and rejection of invite
-        const inviteAcceptedHandler = async () => {
-          socket.emit("invited user accepted invite");
+    // Event handlers for the acceptance and rejection of invite
+    const inviteAcceptedHandler = async () => {
+      socket.emit("invited user accepted invite");
 
-          // initializing the game once the user accepts the invitation
-          await initializeGame(socket, invitedUserSocket);
+      // initializing the game once the user accepts the invitation
+      await initializeGame(socket, invitedUserSocket);
 
-          invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
-          invitedUserSocket.off("invite rejected", inviteRejectedHandler);
-        };
-        invitedUserSocket.on("invite accepted", inviteAcceptedHandler);
+      invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
+      invitedUserSocket.off("invite rejected", inviteRejectedHandler);
+    };
+    invitedUserSocket.on("invite accepted", inviteAcceptedHandler);
 
-        const inviteRejectedHandler = () => {
-          socket.emit("invited user rejected invite");
+    const inviteRejectedHandler = () => {
+      socket.emit("invited user rejected invite");
 
-          // Reactivating the status for the users if the invite is rejected
-          socket.user.status = types.user.ACTIVE;
-          invitedUserSocket.user.status = types.user.ACTIVE;
-          broadcastActiveUsers(io.in("lobby").of("/").sockets);
+      // Reactivating the status for the users if the invite is rejected
+      socket.user.status = types.user.ACTIVE;
+      invitedUserSocket.user.status = types.user.ACTIVE;
+      broadcastActiveUsers(io.in("lobby").of("/").sockets);
 
-          invitedUserSocket.off("invite rejected", inviteRejectedHandler);
-          invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
-        };
-        invitedUserSocket.on("invite rejected", inviteRejectedHandler);
-        invitedUserSocket.on("disconnect", inviteRejectedHandler); // reject when invited user is disconnected
+      invitedUserSocket.off("invite rejected", inviteRejectedHandler);
+      invitedUserSocket.off("invite accepted", inviteAcceptedHandler);
+    };
+    invitedUserSocket.on("invite rejected", inviteRejectedHandler);
+    invitedUserSocket.on("disconnect", inviteRejectedHandler); // reject when invited user is disconnected
 
-        // set a timeout for user to accept invite so that the other user does not wait forever
-        setTimeout(() => {
-          invitedUserSocket.emit("invite canceled");
-        }, 120000);
-        break;
-      }
-    }
+    // set a timeout for user to accept invite so that the other user does not wait forever
+    setTimeout(() => {
+      invitedUserSocket.emit("invite canceled");
+    }, 120000);
   });
 
   socket.on("end game", () => {
