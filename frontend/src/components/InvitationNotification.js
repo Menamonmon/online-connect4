@@ -45,7 +45,7 @@ export default function InvitationNotification({ id }) {
 }
 
 export function addInviteNotification(invitingUser) {
-  const notificationID = `notification-for:${invitingUser.name}-(${invitingUser.id})`;
+  const notificationID = `notification-for:${invitingUser.name}-(${invitingUser.id})-(${Math.random() * 1000})`;
   removeNotification(notificationID);
   const notification = {
     id: notificationID,
