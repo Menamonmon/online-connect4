@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { store } from "react-notifications-component";
 import Game from "../components/Game";
 import GameCell from "../components/GameCell";
 import { useGames } from "../contexts/GamesContext";
@@ -26,6 +27,27 @@ export default function CurrentGamePage() {
     ) {
       return;
     }
+
+    // Adding a notification for the winner if it's added to the game
+    if (currentGame.winner) {
+      const winnerPlayer =
+        currentUser.id === currentGame.winner ? currentUser : invitedUser;
+      const winnerNotification = {
+        title: "Winner",
+        message: `${winnerPlayer.name} won this game!!!!!`,
+        type: "success",
+        insert: "top",
+        container: "top-right",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      };
+      store.addNotification(winnerNotification);
+    }
+
     const currentPlayer =
       currentGame.current_player === currentUser.id ? currentUser : invitedUser;
 
