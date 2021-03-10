@@ -23,11 +23,6 @@ export default function SocketProvider({ children }) {
       setActiveUsers(users);
     });
 
-    socket.on("invite canceled", () => {
-      socket.emit("invite rejected");
-      removeNotification(notificationID);
-    });
-
     socket.on("notify of invite", (invitingUser) => {
       setNotificationID(addInviteNotification(invitingUser));
     });
@@ -81,9 +76,16 @@ export default function SocketProvider({ children }) {
     setCurrentUser,
     setInvitedUser,
     setCurrentGame,
-    notificationID,
     setNotificationID,
   ]);
+
+  useEffect(() => {
+    socket.off("invite canceled");
+    socket.on("invite canceled", () => {
+      socket.emit("invite rejected");
+      removeNotification(notificationID);
+    });
+  }, [notificationID]);
 
   return (
     <SocketContext.Provider
