@@ -3,6 +3,7 @@ import "./SignupPage.css";
 import api from "../requests/api";
 import { useUsers } from "../contexts/UsersContext";
 import { useSocket } from "../contexts/SocketConext";
+import { store } from "react-notifications-component";
 
 export default function SignupPage() {
   let { setCurrentUser } = useUsers();
@@ -21,6 +22,35 @@ export default function SignupPage() {
     e.preventDefault();
     let newUser = {};
     setLoading(true);
+
+    const successSignupNotification = {
+      title: "Signup Success",
+      message: "You have signup successfully successfully.",
+      type: "success",
+      insert: "top",
+      container: "top-right",
+      animationIn: ["animate__animated", "animate__fadeIn"],
+      animationOut: ["animate__animated", "animate__fadeOut"],
+      dismiss: {
+        duration: 5000,
+        onScreen: true,
+      },
+    };
+
+    const failSignupNotification = {
+      title: "Signup Failure",
+      message: error,
+      type: "danger",
+      insert: "top",
+      container: "top-right",
+      animationIn: ["animate__animated", "animate__fadeIn"],
+      animationOut: ["animate__animated", "animate__fadeOut"],
+      dismiss: {
+        duration: 5000,
+        onScreen: true,
+      },
+    };
+
     try {
       newUser = await api.signupUser({ name });
     } catch (err) {
@@ -29,6 +59,8 @@ export default function SignupPage() {
       } else {
         setError("Error with server");
       }
+      failSignupNotification.message = error || "Error with server";
+      store.addNotification(failSignupNotification);
       setLoading(false);
       return;
     }
@@ -36,6 +68,7 @@ export default function SignupPage() {
     setCurrentUser(newUser);
     socket.auth = { user: newUser };
     socket.connect();
+    store.addNotification(successSignupNotification);
     setLoading(false);
   }
 
