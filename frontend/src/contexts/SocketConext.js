@@ -60,7 +60,6 @@ export default function SocketProvider({ children }) {
           onScreen: true,
         },
       };
-      console.log("GAME HAS ENDED");
       store.addNotification(gameEndNotification);
       setCurrentGame({});
       setInvitedUser({});
