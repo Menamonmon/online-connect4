@@ -2,13 +2,10 @@ require("dotenv").config({ path: __dirname + "./../.env" });
 const types = require("./types");
 const { initDB } = require("./init");
 const { Pool } = require("pg");
+const DB_URL = process.env.DATABASE;
 
 const pool = new Pool({
-  user: process.env.PSQL_USER,
-  password: process.env.PSQL_PASSWORD,
-  host: process.env.PSQL_HOST,
-  port: process.env.PSQL_PORT,
-  database: process.env.PSQL_DB,
+  connectionString: DB_URL,
 });
 
 const areUsersEqual = (user1, user2) =>
