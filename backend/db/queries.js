@@ -6,6 +6,9 @@ const DB_URL = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: DB_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 const areUsersEqual = (user1, user2) =>
