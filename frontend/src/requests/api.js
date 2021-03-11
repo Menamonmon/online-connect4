@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://10.0.0.218:5000",
+  baseURL: "https://online-connect4.herokuapp.com",
   timeout: 10000,
 });
 

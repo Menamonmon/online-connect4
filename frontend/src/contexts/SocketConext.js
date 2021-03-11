@@ -8,7 +8,7 @@ import {
 import { useGames } from "./GamesContext";
 import { useUsers } from "./UsersContext";
 
-const URL = "http://10.0.0.218:5000";
+const URL = "https://online-connect4.herokuapp.com";
 const socket = io(URL, { autoConnect: false });
 
 const SocketContext = createContext();
