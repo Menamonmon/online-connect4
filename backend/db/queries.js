@@ -14,6 +14,9 @@ const dbConfig = DEBUG
     }
   : {
       connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false,
+      },
     };
 
 const pool = new Pool(dbConfig);
@@ -26,6 +29,7 @@ async function getUserById(id) {
   if (results.rowCount !== 1) {
     throw new Error(`User with id "${id}" is not found`);
   }
+  console.log("TESTSASDASDSDASDASKJDASDJNKASKJDASD");
   return results.rows[0];
 }
 
