@@ -1,51 +1,42 @@
 import React from "react";
 import { useSocket } from "../contexts/SocketConext";
 import { store as notifications } from "react-notifications-component";
+import { Box } from "@chakra-ui/layout";
+import { Button, ButtonGroup } from "@chakra-ui/button";
 
 export default function InvitationNotification({ id }) {
   const { socket } = useSocket();
 
-  const InviteActionButtonsStyles = {
-    background: "#5ea400",
-    color: "white",
-    border: "none",
-    margin: "10px",
-    fontSize: "1.2rem",
-  };
-
   return (
-    <div
-      style={{
-        margin: "10px",
-      }}
-    >
-      <button
-        onClick={() => {
-          socket.emit("invite accepted");
-          removeNotification(id);
-        }}
-        style={{ ...InviteActionButtonsStyles, background: "#5ea400" }}
-      >
-        Accept
-      </button>
-      <button
-        onClick={() => {
-          socket.emit("invite rejected");
-          removeNotification(id);
-        }}
-        style={{
-          ...InviteActionButtonsStyles,
-          background: "#ec3d3d",
-        }}
-      >
-        Reject
-      </button>
-    </div>
+    <Box>
+      <ButtonGroup>
+        <Button
+          colorScheme="green"
+          onClick={() => {
+            socket.emit("invite accepted");
+            removeNotification(id);
+          }}
+        >
+          Accept
+        </Button>
+        <Button
+          colorScheme="red"
+          onClick={() => {
+            socket.emit("invite rejected");
+            removeNotification(id);
+          }}
+        >
+          Reject
+        </Button>
+      </ButtonGroup>
+    </Box>
   );
 }
 
 export function addInviteNotification(invitingUser) {
-  const notificationID = `notification-for:${invitingUser.name}-(${invitingUser.id})-(${Math.random() * 1000})`;
+  const notificationID = `notification-for:${invitingUser.name}-(${
+    invitingUser.id
+  })-(${Math.random() * 1000})`;
   removeNotification(notificationID);
   const notification = {
     id: notificationID,
