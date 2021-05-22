@@ -15,7 +15,6 @@ const dbConfig = DEBUG
   : {
       connectionString: process.env.DATABASE_URL,
     };
-console.log(dbConfig);
 
 const pool = new Pool(dbConfig);
 

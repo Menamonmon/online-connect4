@@ -81,7 +81,6 @@ const initializeGame = async (currentUserSocket, invitedUserSocket) => {
 };
 
 const endGameHandler = async (socket, finalGame) => {
-  console.log(finalGame);
   let isErrorWithSaving = false;
   let error = null;
   if (finalGame && finalGame !== {}) {
@@ -136,7 +135,6 @@ io.on("connection", async (socket) => {
     for (const [id, s] of io.in("lobby").of("/").sockets) {
       if (id === updatedUser.id) {
         s.user = updatedUser;
-        console.log("USER UPDATED");
         broadcastActiveUsers(io.in("lobby").of("/").sockets);
         break;
       }
@@ -202,20 +200,17 @@ io.on("connection", async (socket) => {
     for (const room of socket.rooms) {
       if (room !== "lobby") socket.leave(room);
     }
-    console.log(finalGame.id);
     socket.emit("clear game");
     socket.user.status = types.user.ACTIVE;
     broadcastActiveUsers(io.in("lobby").of("/").sockets);
   });
 
   socket.on("disconnecting", async () => {
-    console.log(socket.game);
     await endGameHandler(socket, socket.game);
     logoutSocket(socket);
   });
 
   socket.on("disconnect", () => {
-    console.log("USER LOGGED OUT");
     // broadcasing a list of the udapted active users
     broadcastActiveUsers(io.in("lobby").of("/").sockets);
   });
