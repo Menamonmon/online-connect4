@@ -5,11 +5,11 @@ import {
   addInviteNotification,
   removeNotification,
 } from "../components/InvitationNotification";
+import { baseURL } from "../consts";
 import { useGames } from "./GamesContext";
 import { useUsers } from "./UsersContext";
 
-const URL = "https://online-connect4.herokuapp.com";
-const socket = io(URL, { autoConnect: false });
+const socket = io(baseURL, { autoConnect: false });
 
 const SocketContext = createContext();
 
