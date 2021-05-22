@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Heading, ListItem, Text } from "@chakra-ui/layout";
+import { Heading, HStack, ListItem, Text } from "@chakra-ui/layout";
 import { List } from "@chakra-ui/react";
 
 import { useUsers } from "../contexts/UsersContext";
@@ -18,7 +18,14 @@ export default function Navbar() {
   const isAuthenticated = !isObjectEmpty(currentUser);
   const gameExists = !isObjectEmpty(currentGame);
   return (
-    <List display="flex" py={3} px={5} alignItems="center" bgColor="blue.200">
+    <List
+      display="flex"
+      py={3}
+      px={5}
+      alignItems="center"
+      bgColor="blue.50"
+      as={HStack}
+    >
       <ListItem flexGrow="1">
         <Heading
           size="md"
@@ -39,19 +46,15 @@ export default function Navbar() {
           </Text>
         </Heading>
       </ListItem>
-      {isAuthenticated ? (
-        <ListItem key="logout">
-          <LogoutButton />
-        </ListItem>
-      ) : (
-        <></>
-      )}
-      {gameExists ? (
+      {gameExists && (
         <ListItem key="leave-game">
           <LeaveGameButton />
         </ListItem>
-      ) : (
-        <></>
+      )}
+      {isAuthenticated && (
+        <ListItem key="logout">
+          <LogoutButton />
+        </ListItem>
       )}
     </List>
   );
