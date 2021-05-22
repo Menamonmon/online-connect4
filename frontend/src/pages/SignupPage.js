@@ -1,9 +1,17 @@
 import React, { useState } from "react";
-import "./SignupPage.css";
+// import "./SignupPage.css";
 import api from "../requests/api";
 import { useUsers } from "../contexts/UsersContext";
 import { useSocket } from "../contexts/SocketConext";
 import { store } from "react-notifications-component";
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  VStack,
+} from "@chakra-ui/react";
 
 export default function SignupPage() {
   let { setCurrentUser } = useUsers();
@@ -73,27 +81,33 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="signup-container">
-      <label htmlFor="name" className="name-label">
-        Name:
-      </label>
-      <br />
-      <input
-        type="text"
-        className="name-field"
-        placeholder={error || "Type your name here"}
-        name="name"
-        value={name}
-        onChange={handleChange}
-      />
-      <br />
-      <button
-        className="signup-submit-btn"
-        onClick={submitForm}
-        disabled={loading}
+    <VStack justifyContent="center" h="100vh">
+      <Heading m={10}>Welcome To Online Connect 4</Heading>
+      <FormControl
+        onSubmit={submitForm}
+        as="form"
+        id="signup-form"
+        w="500px"
+        minW="300px"
+        maxW="500px"
+        p={5}
+        mx="auto"
+        borderRadius="15px"
+        isRequired
       >
-        Sign Up
-      </button>
-    </div>
+        <FormLabel color="blue.900">Name</FormLabel>
+        <Input
+          colorScheme="blue"
+          name="name"
+          type="text"
+          placeholder={error || "Type your name here..."}
+          value={name}
+          onChange={handleChange}
+        />
+        <Button mt={5} type="submit" disabled={loading} colorScheme="yellow">
+          {!loading ? "Proceed to Game" : "Loading..."}
+        </Button>
+      </FormControl>
+    </VStack>
   );
 }
