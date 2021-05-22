@@ -4,26 +4,7 @@ import { Tooltip } from "@chakra-ui/tooltip";
 import React from "react";
 
 import { useTypes } from "../contexts/TypesContext";
-
-const matchUserStatus = (status, types) => {
-  const keys = Object.keys(types);
-  const values = Object.values(types);
-
-  const valIndex = values.indexOf(status);
-  if (!(valIndex >= 0)) {
-    return "";
-  }
-
-  return keys[valIndex].toLowerCase();
-};
-
-function isActive(userStatusString) {
-  return userStatusString === "active";
-}
-
-function formatDate(createdAt) {
-  return `${createdAt.getMonth()}/${createdAt.getDate()}/${createdAt.getFullYear()}`;
-}
+import { formatDate, isActive, matchUserStatus } from "../utils/utils";
 
 export default function UserListItem({
   user: { name, status, created_at },

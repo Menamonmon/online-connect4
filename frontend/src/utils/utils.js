@@ -1,5 +1,24 @@
 export const isObjectEmpty = (obj) => {
   return Object.keys(obj).length === 0;
+};
+export const matchUserStatus = (status, types) => {
+  const keys = Object.keys(types);
+  const values = Object.values(types);
+
+  const valIndex = values.indexOf(status);
+  if (!(valIndex >= 0)) {
+    return "";
+  }
+
+  return keys[valIndex].toLowerCase();
+};
+
+export function isActive(userStatusString) {
+  return userStatusString === "active";
+}
+
+export function formatDate(createdAt) {
+  return `${createdAt.getMonth()}/${createdAt.getDate()}/${createdAt.getFullYear()}`;
 }
 
 export const evaluateUsersColors = (currentUser, invitedUser, game) => {
