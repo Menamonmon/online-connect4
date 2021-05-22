@@ -7,6 +7,7 @@ import UsersListItem from "./UsersListItem";
 import InviteUserModal from "./InviteUserModal";
 
 import { isObjectEmpty } from "../utils/utils";
+import { Box, Heading, List, VStack } from "@chakra-ui/layout";
 
 export default function UsersList() {
   const { activeUsers: users, setInvitedUser } = useUsers();
@@ -21,8 +22,11 @@ export default function UsersList() {
   }, [currentGame, history]);
 
   return (
-    <div>
-      <li className="users-list">
+    <Box w="500px" mx="auto">
+      <Heading size="lg" textAlign="left" my={5}>
+        Players in the Lobby
+      </Heading>
+      <List as={VStack}>
         {users.map((user) => (
           <UsersListItem
             user={user}
@@ -33,8 +37,8 @@ export default function UsersList() {
             key={`user-${user.id}`}
           />
         ))}
-      </li>
+      </List>
       <InviteUserModal isOpen={isModalOpen} setOpen={setIsModalOpen} />
-    </div>
+    </Box>
   );
 }

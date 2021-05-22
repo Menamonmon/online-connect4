@@ -1,3 +1,6 @@
+import { Button } from "@chakra-ui/button";
+import { Circle, Heading, HStack, ListItem } from "@chakra-ui/layout";
+import { Tooltip } from "@chakra-ui/tooltip";
 import React from "react";
 
 import { useTypes } from "../contexts/TypesContext";
@@ -14,29 +17,39 @@ const matchUserStatus = (status, types) => {
   return keys[valIndex].toLowerCase();
 };
 
+function isActive(userStatusString) {
+  return userStatusString === "active";
+}
+
+function formatDate(createdAt) {
+  return `${createdAt.getMonth()}/${createdAt.getDate()}/${createdAt.getFullYear()}`;
+}
+
 export default function UserListItem({
   user: { name, status, created_at },
   onInvite,
 }) {
   const { user: userTypes } = useTypes();
   const createdAt = new Date(created_at);
+  const isUserActive = isActive(matchUserStatus(status, userTypes));
   return (
-    <div className="user-list-item">
-      <h3 className="user-name">{name}</h3>
-      <h4
-        className="user-status"
-        style={{
-          textTransform: "capitalize",
-        }}
-      >
-        {matchUserStatus(status, userTypes)}
-        <br />
-        Joined Since{" "}
-        {`${createdAt.getMonth()}/${createdAt.getDate()}/${createdAt.getFullYear()}`}
-      </h4>
-      <button className="invite-btn" onClick={onInvite}>
-        Invite To Game
-      </button>
-    </div>
+    <ListItem
+      as={HStack}
+      borderRadius="15px"
+      bgColor="blue.200"
+      p={5}
+      my={5}
+      w="100%"
+      justifyContent="space-between"
+    >
+      <Heading size="md">{name}</Heading>
+      <Tooltip label={isUserActive ? "User is Active" : "User Not Active"}>
+        <Circle size="10px" bg={isUserActive ? "green" : "red"} />
+      </Tooltip>
+      <Heading size="sm">Active Since: {formatDate(createdAt)}</Heading>
+      <Button onClick={onInvite} colorScheme="green">
+        Invite To A Game
+      </Button>
+    </ListItem>
   );
 }
