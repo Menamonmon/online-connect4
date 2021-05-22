@@ -1,23 +1,23 @@
 {
   "files": {
     "main.css": "/online-connect4/static/css/main.cd27c400.chunk.css",
-    "main.js": "/online-connect4/static/js/main.3685c567.chunk.js",
-    "main.js.map": "/online-connect4/static/js/main.3685c567.chunk.js.map",
+    "main.js": "/online-connect4/static/js/main.dfc0a4a8.chunk.js",
+    "main.js.map": "/online-connect4/static/js/main.dfc0a4a8.chunk.js.map",
     "runtime-main.js": "/online-connect4/static/js/runtime-main.b73a2e19.js",
     "runtime-main.js.map": "/online-connect4/static/js/runtime-main.b73a2e19.js.map",
     "static/css/2.6d7c6ada.chunk.css": "/online-connect4/static/css/2.6d7c6ada.chunk.css",
-    "static/js/2.26d65667.chunk.js": "/online-connect4/static/js/2.26d65667.chunk.js",
-    "static/js/2.26d65667.chunk.js.map": "/online-connect4/static/js/2.26d65667.chunk.js.map",
+    "static/js/2.d7094386.chunk.js": "/online-connect4/static/js/2.d7094386.chunk.js",
+    "static/js/2.d7094386.chunk.js.map": "/online-connect4/static/js/2.d7094386.chunk.js.map",
     "index.html": "/online-connect4/index.html",
     "static/css/2.6d7c6ada.chunk.css.map": "/online-connect4/static/css/2.6d7c6ada.chunk.css.map",
     "static/css/main.cd27c400.chunk.css.map": "/online-connect4/static/css/main.cd27c400.chunk.css.map",
-    "static/js/2.26d65667.chunk.js.LICENSE.txt": "/online-connect4/static/js/2.26d65667.chunk.js.LICENSE.txt"
+    "static/js/2.d7094386.chunk.js.LICENSE.txt": "/online-connect4/static/js/2.d7094386.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.b73a2e19.js",
     "static/css/2.6d7c6ada.chunk.css",
-    "static/js/2.26d65667.chunk.js",
+    "static/js/2.d7094386.chunk.js",
     "static/css/main.cd27c400.chunk.css",
-    "static/js/main.3685c567.chunk.js"
+    "static/js/main.dfc0a4a8.chunk.js"
   ]
 }
