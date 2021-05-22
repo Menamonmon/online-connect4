@@ -1,6 +1,7 @@
 import React from "react";
 import { useSocket } from "../contexts/SocketConext";
 import { store } from "react-notifications-component";
+import { Button } from "@chakra-ui/button";
 
 export default function LogoutButton() {
   const { socket } = useSocket();
@@ -24,8 +25,8 @@ export default function LogoutButton() {
   }
 
   return (
-    <button onClick={logout} className="logout-btn">
+    <Button size="sm" onClick={logout} colorScheme="red">
       Logout
-    </button>
+    </Button>
   );
 }
