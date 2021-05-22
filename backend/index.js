@@ -232,7 +232,8 @@ app.use("/users", require("./routes/api/users"));
 app.use("/games", require("./routes/api/games"));
 
 const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, async () => {
+const HOST = process.env.HOST || "0.0.0.0";
+httpServer.listen(PORT, HOST, async () => {
   await initializeDatabase();
-  console.log(`Starting Server At Port (${PORT})`);
+  console.log(`Starting Server At (${PORT})`);
 });
