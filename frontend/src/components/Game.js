@@ -4,8 +4,8 @@ import { useSocket } from "../contexts/SocketConext";
 import { useUsers } from "../contexts/UsersContext";
 import { useTypes } from "../contexts/TypesContext";
 
-import "./Game.css";
 import GameCell from "./GameCell";
+import { Box } from "@chakra-ui/layout";
 
 export default function Game({ playerColor, useWarning }) {
   const { currentGame, setCurrentGame } = useGames();
@@ -158,7 +158,17 @@ export default function Game({ playerColor, useWarning }) {
   }
 
   return (
-    <div className="game-container">
+    <Box
+      bgColor="blue.500"
+      minH="500px"
+      minW="500px"
+      display="grid"
+      gridTemplateColumns="repeat(6, 1fr)"
+      gridTemplateRows="repeat(6, 1fr)"
+      gridGap="10px"
+      p="10px"
+      borderRadius="15px"
+    >
       {currentGame.state
         .split("")
         .map((a) => parseInt(a))
@@ -170,6 +180,6 @@ export default function Game({ playerColor, useWarning }) {
             key={`game-cell-${i}`}
           />
         ))}
-    </div>
+    </Box>
   );
 }

@@ -1,3 +1,4 @@
+import { Box, Heading, HStack, VStack } from "@chakra-ui/layout";
 import React, { useEffect, useState } from "react";
 import { store } from "react-notifications-component";
 import Game from "../components/Game";
@@ -16,8 +17,6 @@ export default function CurrentGamePage() {
       ? "This is your turn"
       : "This is your opponent's turn"
   );
-
-  const infoStyle = { color: "green", margin: 0 };
 
   useEffect(() => {
     if (
@@ -65,64 +64,70 @@ export default function CurrentGamePage() {
   }, [currentGame, currentUser, invitedUser]);
 
   return isObjectEmpty(currentGame) ? (
-    <h1>Ending the game because one of the plyers left</h1>
+    <Heading>Ending the game because one of the plyers left</Heading>
   ) : (
-    <div className="game-page-container">
-      <div
-        className="game-page-header"
-        style={{
-          textAlign: "left",
-          width: "calc(70vw + 20px)",
-          margin: "20px auto",
-          padding: "0px",
-          maxWidth: "90vh",
-        }}
-      >
-        <div
-          className="game-page-title"
-          style={{
-            backgroundColor: "lightgrey",
-            padding: "10px",
-          }}
-        >
-          <h3 style={infoStyle}>
-            You: {currentUser.name}
-            <div style={{ float: "right" }}>
-              <GameCell state={currentUserColor} custom width="5vh" />
-            </div>
-          </h3>
-          <br />
-          <h3 style={{ ...infoStyle, color: "red" }}>
-            Opponent: {invitedUser.name}
-            <div style={{ float: "right" }}>
-              <GameCell state={invitedUserColor} custom width="5vh" />
-            </div>
-          </h3>
-        </div>
-        <div
-          className="stats-section"
-          style={{ backgroundColor: "lightgrey", padding: 10 }}
-        >
-          <h3 style={{ ...infoStyle, color: "blue" }}>Stats:</h3>
-          <h5 style={{ margin: 0 }}>Current Player: {currentPlayer.name}</h5>
-          <h5 style={{ margin: 0 }}>
+    <HStack
+      bgColor="gray.100"
+      h="fit-content"
+      maxW="750px"
+      mx="auto"
+      p={3}
+      borderRadius="15px"
+      my={3}
+    >
+      <VStack textAlign="left" w="100%">
+        <VStack w="100%">
+          <HStack
+            justify="space-between"
+            px={2}
+            w="100%"
+            bgColor="blue.200"
+            borderRadius="15px"
+            py={2}
+          >
+            <Heading size="sm" color="green">
+              You: {currentUser.name}
+            </Heading>
+            <GameCell state={currentUserColor} custom width="5vh" />
+          </HStack>
+          <HStack
+            justify="space-between"
+            px={2}
+            w="100%"
+            bgColor="blue.200"
+            borderRadius="15px"
+            py={2}
+          >
+            <Heading size="sm" color="red">
+              Opponent: {invitedUser.name}
+            </Heading>
+            <GameCell state={invitedUserColor} custom width="5vh" />
+          </HStack>
+        </VStack>
+        <Box w="100%">
+          <Heading size="md" color="blue.500">
+            Stats:
+          </Heading>
+          <Heading size="sm">Current Player: {currentPlayer.name}</Heading>
+          <Heading size="sm">
+            Winner:{" "}
             {currentGame.winner
-              ? `${
-                  currentGame.winner === currentUser.id
-                    ? currentUser.name
-                    : invitedUser.name
-                } is the winner!!!`
-              : "No Winner Yet :("}
-          </h5>
-          <h5 style={{ margin: 0 }}>{warning}</h5>
-        </div>
-      </div>
+              ? currentGame.winner === currentUser.id
+                ? currentUser.name
+                : invitedUser.name
+              : "Not Yet :("}
+          </Heading>
+          <Heading size="sm" color="yellow.600">
+            {warning}
+          </Heading>
+        </Box>
+      </VStack>
       <Game
         useWarning={() => [warning, setWarning]}
         playerColor={
           currentPlayer.id === currentUser.id ? currentUserColor : null
         }
       />
-    </div>
+    </HStack>
   );
 }

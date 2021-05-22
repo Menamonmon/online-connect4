@@ -1,8 +1,9 @@
+import { Circle } from "@chakra-ui/layout";
 import React from "react";
 
 export default function GameCell({ state, index, onClick, custom, width }) {
   function mapStateToColor(s) {
-    return ["white", "red", "yellow"][s];
+    return ["white", "red.500", "yellow.500"][s];
   }
 
   if (custom === undefined) {
@@ -13,28 +14,14 @@ export default function GameCell({ state, index, onClick, custom, width }) {
     const col = calcCol(index);
 
     return (
-      <div
-        className="game-cell"
+      <Circle
+        w={width}
+        h={width}
         onClick={(e) => onClick(e, row, col)}
-        style={{
-          borderRadius: "50%",
-          backgroundColor: mapStateToColor(state),
-          gridColumn: row,
-          gridRow: col,
-        }}
+        bgColor={mapStateToColor(state)}
       />
     );
   } else {
-    return (
-      <div
-        className="game-cell"
-        style={{
-          borderRadius: "50%",
-          backgroundColor: mapStateToColor(state),
-          width,
-          height: width,
-        }}
-      />
-    );
+    return <Circle w={width} h={width} bgColor={mapStateToColor(state)} />;
   }
 }
