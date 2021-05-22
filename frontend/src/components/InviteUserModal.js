@@ -1,7 +1,16 @@
-import React, { useState } from "react";
-import Modal from "react-modal";
+import { Box, Heading, Text, VStack } from "@chakra-ui/layout";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+} from "@chakra-ui/modal";
+import { CircularProgress } from "@chakra-ui/progress";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSocket } from "../contexts/SocketConext";
 import { useUsers } from "../contexts/UsersContext";
+import { formatDate } from "../utils/utils";
 
 const invitationStatusValues = {
   PENDING: "Pending Invitation Acceptance",
@@ -16,58 +25,70 @@ export default function InviteUserModal({ isOpen, setOpen }) {
     invitationStatusValues.PENDING
   );
 
+  const onOpen = useCallback(() => {
+    socket.emit("invite user", invitedUser);
+
+    const inviteAcceptedHandler = () => {
+      setTimeout(() => {
+        setOpen(false);
+        setInvitationStatus(invitationStatusValues.ACCEPTED);
+        socket.off("invited user accepted invite", inviteAcceptedHandler);
+        socket.off("invited user rejected invite", inviteRejectedHandler);
+      }, 3000);
+    };
+
+    const inviteRejectedHandler = () => {
+      setTimeout(() => {
+        setOpen(false);
+        setInvitedUser({});
+        setInvitationStatus(invitationStatusValues.REJECTED);
+        socket.off("invited user accepted invite", inviteAcceptedHandler);
+        socket.off("invited user rejected invite", inviteRejectedHandler);
+      }, 3000);
+    };
+
+    socket.on("invited user accepted invite", inviteAcceptedHandler);
+    socket.on("invited user rejected invite", inviteRejectedHandler);
+  }, [socket, invitedUser, setInvitedUser, setOpen]);
+
+  const onClose = () => {
+    setInvitationStatus(invitationStatusValues.PENDING);
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      onOpen();
+    }
+  }, [isOpen, onOpen]);
+
+  const { name, created_at } = invitedUser;
   return (
     <Modal
+      closeOnOverlayClick={false}
+      closeOnEsc={false}
       isOpen={isOpen}
-      onAfterClose={() => {
-        setInvitationStatus(invitationStatusValues.PENDING);
-      }}
-      onAfterOpen={() => {
-        socket.emit("invite user", invitedUser);
-
-        const inviteAcceptedHandler = () => {
-          setTimeout(() => {
-            setOpen(false);
-          }, 3000);
-          setInvitationStatus(invitationStatusValues.ACCEPTED);
-          socket.off("invited user accepted invite", inviteAcceptedHandler);
-          socket.off("invited user rejected invite", inviteRejectedHandler);
-        };
-
-        const inviteRejectedHandler = () => {
-          setTimeout(() => {
-            setOpen(false);
-          }, 3000);
-          setInvitedUser({});
-          setInvitationStatus(invitationStatusValues.REJECTED);
-          socket.off("invited user accepted invite", inviteAcceptedHandler);
-          socket.off("invited user rejected invite", inviteRejectedHandler);
-        };
-
-        socket.on("invited user accepted invite", inviteAcceptedHandler);
-        socket.on("invited user rejected invite", inviteRejectedHandler);
-      }}
-      style={{
-        content: {
-          width: "fit-content",
-          height: "fit-content",
-          margin: "auto",
-        },
-      }}
+      isCentered
+      onClose={onClose}
     >
-      <h1>{invitationStatus}</h1>
-      <div>
-        <h3>Invited User Info:</h3>
-        <div style={{ margin: "20px" }}>
-          <strong>Username: {invitedUser.name}</strong>
-          <br />
-          <strong>Date Joined: {invitedUser.created_at}</strong>
-        </div>
-      </div>
-      <img
-        alt="loading animation gif"
-        src="https://i.pinimg.com/originals/25/ef/28/25ef280441ad6d3a5ccf89960b4e95eb.gif"
-      />
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>{invitationStatus}</ModalHeader>
+        <ModalBody pb={6}>
+          <Heading size="sm">Invited User Info:</Heading>
+          <Box ml={5}>
+            <Text>Name: {name}</Text>
+            <Text>Date Joined: {formatDate(new Date(created_at))}</Text>
+          </Box>
+          <Box display="flex" mt={5}>
+            <CircularProgress
+              mx="auto"
+              isIndeterminate
+              size="100%"
+              color="green"
+            />
+          </Box>
+        </ModalBody>
+      </ModalContent>
     </Modal>
   );
 }
