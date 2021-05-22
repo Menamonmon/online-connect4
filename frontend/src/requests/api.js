@@ -1,7 +1,11 @@
 import axios from "axios";
 
+const DEBUG = process.env.REACT_APP_DEBUG === "true";
+
 const apiClient = axios.create({
-  baseURL: "https://online-connect4.herokuapp.com",
+  baseURL: DEBUG
+    ? "http://localhost:5000"
+    : "https://online-connect4.herokuapp.com",
   timeout: 10000,
 });
 

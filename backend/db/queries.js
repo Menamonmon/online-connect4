@@ -3,9 +3,21 @@ const types = require("./types");
 const { initDB } = require("./init");
 const { Pool } = require("pg");
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, 
-});
+const DEBUG = process.env.DEBUG === "true";
+const dbConfig = DEBUG
+  ? {
+      user: process.env.PSQL_USER,
+      database: process.env.PSQL_DATABASE,
+      password: process.env.PSQL_PASSWORD,
+      port: process.env.PSQL_PORT,
+      host: process.env.PSQL_HOST,
+    }
+  : {
+      connectionString: process.env.DATABASE_URL,
+    };
+console.log(dbConfig);
+
+const pool = new Pool(dbConfig);
 
 const areUsersEqual = (user1, user2) =>
   JSON.stringify(user1) === JSON.stringify(user2);
