@@ -26,18 +26,25 @@ export default function UsersList() {
       <Heading size="lg" textAlign="left" my={5}>
         Players in the Lobby
       </Heading>
-      <List as={VStack}>
-        {users.map((user) => (
-          <UsersListItem
-            user={user}
-            onInvite={() => {
-              setInvitedUser(user);
-              setIsModalOpen(true);
-            }}
-            key={`user-${user.id}`}
-          />
-        ))}
-      </List>
+      {users.length === 0 ? (
+        <Heading size="md" color="red">
+          No Users Are Currently in the Lobby! :( <br />
+          Please wait for someone to join.
+        </Heading>
+      ) : (
+        <List as={VStack}>
+          {users.map((user) => (
+            <UsersListItem
+              user={user}
+              onInvite={() => {
+                setInvitedUser(user);
+                setIsModalOpen(true);
+              }}
+              key={`user-${user.id}`}
+            />
+          ))}
+        </List>
+      )}
       <InviteUserModal isOpen={isModalOpen} setOpen={setIsModalOpen} />
     </Box>
   );
