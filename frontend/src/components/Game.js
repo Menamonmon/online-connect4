@@ -41,43 +41,43 @@ export default function Game({ playerColor, useWarning }) {
     return availableIndex;
   }
 
-  function isMoveWinning(gameState) {
-    const isIdentical = (arr) => arr.every((v) => v === arr[0]);
-    const getDiagonalArrays = (arr) => {
-      const result = [];
-      const r = arr.length;
-      const c = arr[0].length;
-      const maxLength = Math.max(r, c);
-      let temp;
-      for (let i = 0; i <= (maxLength - 1) * 2; ++i) {
-        temp = [];
-        for (let y = r - 1; y >= 0; --y) {
-          let x = i - y;
-          if (x >= 0 && x < c) {
-            temp.push(arr[y][x]);
-          }
-        }
-
-        if (temp.length >= 4) {
-          result.push(temp);
-        }
-
-        temp = [];
-        for (let y = r - 1; y >= 0; --y) {
-          let x = i - (r - y);
-          if (x >= 0 && x < c) {
-            temp.push(arr[y][x]);
-          }
-        }
-
-        if (temp.length >= 4) {
-          result.push(temp);
+  const isIdentical = (arr) => arr.every((v) => v === arr[0]);
+  const getDiagonalArrays = (arr) => {
+    const result = [];
+    const r = arr.length;
+    const c = arr[0].length;
+    const maxLength = Math.max(r, c);
+    let temp;
+    for (let i = 0; i <= (maxLength - 1) * 2; ++i) {
+      temp = [];
+      for (let y = r - 1; y >= 0; --y) {
+        let x = i - y;
+        if (x >= 0 && x < c) {
+          temp.push(arr[y][x]);
         }
       }
 
-      return result;
-    };
+      if (temp.length >= 4) {
+        result.push(temp);
+      }
 
+      temp = [];
+      for (let y = r - 1; y >= 0; --y) {
+        let x = i - (r - y);
+        if (x >= 0 && x < c) {
+          temp.push(arr[y][x]);
+        }
+      }
+
+      if (temp.length >= 4) {
+        result.push(temp);
+      }
+    }
+
+    return result;
+  };
+
+  function isMoveWinning(gameState) {
     const state = [];
     for (let i = 0; i < 6; i++) {
       let row = [];
@@ -110,7 +110,14 @@ export default function Game({ playerColor, useWarning }) {
     }
 
     // Checking the diagonals
-    for (let arr of getDiagonalArrays(state)) {
+    const diagonals = getDiagonalArrays(state);
+    for (let arr of diagonals) {
+      if (arr.length === 4) {
+        if (isIdentical(arr)) {
+          return true;
+        }
+        continue;
+      }
       let length = arr.length;
       let k = length - 4;
       for (let i = 0; i < k; i++) {
