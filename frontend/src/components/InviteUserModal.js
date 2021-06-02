@@ -8,6 +8,7 @@ import {
 } from "@chakra-ui/modal";
 import { CircularProgress } from "@chakra-ui/progress";
 import React, { useCallback, useEffect, useState } from "react";
+import { useGames } from "../contexts/GamesContext";
 import { useSocket } from "../contexts/SocketConext";
 import { useUsers } from "../contexts/UsersContext";
 import { formatDate } from "../utils/utils";
@@ -21,6 +22,7 @@ const invitationStatusValues = {
 export default function InviteUserModal({ isOpen, setOpen }) {
   const { invitedUser, setInvitedUser } = useUsers();
   const { socket } = useSocket();
+  const { currentGame } = useGames();
   const [invitationStatus, setInvitationStatus] = useState(
     invitationStatusValues.PENDING
   );
@@ -42,6 +44,9 @@ export default function InviteUserModal({ isOpen, setOpen }) {
         setOpen(false);
         setInvitedUser({});
         setInvitationStatus(invitationStatusValues.REJECTED);
+        if (currentGame) {
+          socket.emit("end game", currentGame);
+        }
         socket.off("invited user accepted invite", inviteAcceptedHandler);
         socket.off("invited user rejected invite", inviteRejectedHandler);
       }, 3000);

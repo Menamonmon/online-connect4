@@ -113,7 +113,7 @@ export default function Game({ playerColor, useWarning }) {
     const diagonals = getDiagonalArrays(state);
     for (let arr of diagonals) {
       if (arr.length === 4) {
-        if (isIdentical(arr)) {
+        if (isIdentical(arr) && arr[0] !== EMPTYCELL) {
           return true;
         }
         continue;

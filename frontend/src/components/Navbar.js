@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 
 import { Heading, HStack, ListItem, Text } from "@chakra-ui/layout";
 import { List } from "@chakra-ui/react";
@@ -10,6 +10,7 @@ import LeaveGameButton from "./LeaveGameButton";
 import LogoutButton from "./LogoutButton";
 
 import { isObjectEmpty } from "../utils/utils";
+import ReplayGameButton from "./ReplayGameButton";
 
 export default function Navbar() {
   const { currentUser } = useUsers();
@@ -47,9 +48,14 @@ export default function Navbar() {
         </Heading>
       </ListItem>
       {gameExists && (
-        <ListItem key="leave-game">
-          <LeaveGameButton />
-        </ListItem>
+        <Fragment>
+          <ListItem key="replay">
+            <ReplayGameButton />
+          </ListItem>
+          <ListItem key="leave-game">
+            <LeaveGameButton />
+          </ListItem>
+        </Fragment>
       )}
       {isAuthenticated && (
         <ListItem key="logout">

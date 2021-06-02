@@ -29,7 +29,9 @@ export default function UsersList() {
       {users.length === 0 ? (
         <Heading size="md" color="red">
           No Users Are Currently in the Lobby! :( <br />
-          Please wait for someone to join.
+          Please wait for someone to join. <br />
+          If you don't want to wait for players, you can open the game from
+          another tab and play against yourself.
         </Heading>
       ) : (
         <List as={VStack}>
